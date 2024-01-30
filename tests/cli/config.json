@@ -1,0 +1,28 @@
+[
+  {
+    "request": {
+      "prompt": "Hi"
+    },
+    "response": {
+      "content": "How can I assist you?"
+    }
+  },
+  {
+    "request": {
+      "prompt": "Hello",
+      "model": "gpt-4"
+    },
+    "response": {
+      "content": "How can I assist you?"
+    }
+  },
+  {
+    "request": {
+      "prompt": "Hello",
+      "temperature": 1.0
+    },
+    "response": {
+      "content": "How can I assist you?"
+    }
+  }
+]

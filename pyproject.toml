@@ -1,0 +1,49 @@
+[tool.poetry]
+name = "mocogpt"
+version = "0.1.0"
+description = "Moco GPT is stub GPT server which allows you build and test your LLM application locally."
+authors = ["dreamhead <dreamhead.cn@gmail.com>"]
+readme = "README.md"
+license = "MIT"
+packages = [{include = "mocogpt"}]
+
+[tool.poetry.scripts]
+mocogpt = "mocogpt.cli.app:app"
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.12"
+aiohttp = "^3.9.3"
+tiktoken = "^0.5.2"
+click = {version = "^8.1.7", extras = ["cli"]}
+loguru = {version = "^0.7.2", extras = ["cli"]}
+
+[tool.poetry.extras]
+cli = ["click", "loguru"]
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.1.15"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.0.0"
+openai = "^1.10.0"
+pytest-cov = "^4.1.0"
+
+[tool.pytest.ini_options]
+testpaths = [
+  "tests"
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+select = [
+  "E",  # pycodestyle
+  "F",  # pyflakes
+  "UP", # pyupgrade,
+  "I",  # isort
+]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
