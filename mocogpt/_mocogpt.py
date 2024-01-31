@@ -1,7 +1,7 @@
-from mocogpt.core._base import GptServer, RequestMatcher, ResponseHandler
-from mocogpt.core._handler import ContentResponseHandler
-from mocogpt.core._matcher import AllOfMatcher, AnyOfMatcher, ModelMatcher, PromptMatcher, TemperatureMatcher
-from mocogpt.core._server import ActualGptServer
+from .core._base import GptServer, RequestMatcher, ResponseHandler
+from .core._handler import ContentResponseHandler
+from .core._matcher import AllOfMatcher, AnyOfMatcher, ApiKeyMatcher, ModelMatcher, PromptMatcher, TemperatureMatcher
+from .core._server import ActualGptServer
 
 
 def gpt_server(port) -> GptServer:
@@ -18,6 +18,10 @@ def all_of(*matchers: RequestMatcher) -> RequestMatcher:
 
 def any_of(*matchers: RequestMatcher) -> RequestMatcher:
     return AnyOfMatcher(matchers)
+
+
+def api_key(key: str) -> RequestMatcher:
+    return ApiKeyMatcher(key)
 
 
 def prompt(text: str) -> RequestMatcher:

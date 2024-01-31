@@ -12,15 +12,16 @@ class TestMocoGPTCli:
             ["python", app_file,
              "start", config_file,
              "--port", "12306"
-             ])
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": "Hi"}]
-        )
-
-        assert response.choices[0].message.content == "How can I assist you?"
-        service_process.terminate()
-        service_process.wait()
+             ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": "Hi"}]
+            )
+            assert response.choices[0].message.content == "How can I assist you?"
+        finally:
+            service_process.terminate()
+            service_process.wait()
 
     def test_should_run_with_model_and_prompt(self, client):
         current_directory = os.path.dirname(os.path.abspath(__file__))

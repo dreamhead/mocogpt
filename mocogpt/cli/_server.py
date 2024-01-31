@@ -13,10 +13,11 @@ logger.add(sys.stdout, colorize=True,
 
 class LogMonitor(Monitor):
     def on_server_start(self, server):
-        logger.info(f"Server started on port {server.port}")
+        logger.info("Server started on port {port}", port=server.port)
 
-    def on_server_end(self, server):
-        pass
+    def on_server_end(self, server, elapsed):
+        logger.info("Server stopped")
+        logger.info("Total time: {elapsed} seconds", elapsed=elapsed)
 
     async def on_session_start(self, request):
         logger.info(f"Request: {request}")

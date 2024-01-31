@@ -18,28 +18,34 @@ def split_content(model, content):
     result = encoding.encode(content)
     return [encoding.decode_single_token_bytes(token).decode("utf-8") for token in result]
 
+
 class Request:
-    def __init__(self, request: dict):
-        self.request = request
+    def __init__(self, headers, content: dict):
+        self._headers = headers
+        self._content = content
 
     @property
     def prompt(self) -> str:
-        return self.request['messages'][-1]['content']
+        return self._content['messages'][-1]['content']
 
     @property
     def model(self) -> str:
-        return self.request['model']
+        return self._content['model']
 
     @property
     def temperature(self) -> float:
-        return self.request['temperature']
+        return self._content['temperature']
 
     @property
     def stream(self) -> bool:
-        if 'stream' in self.request:
-            return self.request['stream']
+        if 'stream' in self._content:
+            return self._content['stream']
 
         return False
+
+    @property
+    def api_key(self) -> str:
+        return self._headers['Authorization'].split('Bearer ')[1]
 
 
 class Response:
@@ -73,10 +79,6 @@ class Response:
     @property
     def model(self):
         return self._model
-
-    @model.setter
-    def model(self, model):
-        self._model = model
 
     @property
     def content(self):
@@ -141,5 +143,8 @@ class SessionSetting:
 
 
 class GptServer(ABC):
+    def completions(self, matcher) -> SessionSetting:
+        pass
+
     def request(self, matcher) -> SessionSetting:
         pass

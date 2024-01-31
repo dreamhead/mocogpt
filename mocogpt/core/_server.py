@@ -33,7 +33,7 @@ class Monitor(ABC):
     def on_server_start(self, server):
         pass
 
-    def on_server_end(self, server):
+    def on_server_end(self, server, elapsed):
         pass
 
     async def on_session_start(self, request):
@@ -70,9 +70,14 @@ class ActualGptServer(GptServer):
         self.loop.run_until_complete(self._start())
         self.loop.run_forever()
 
+    def stop_server(self, elapsed):
+        asyncio.run_coroutine_threadsafe(self._stop(), self.loop)
+        self.loop.call_soon_threadsafe(self.loop.stop)
+        self.monitor.on_server_end(self, elapsed)
+
     async def _start(self):
         app = web.Application()
-        app.router.add_post('/v1/chat/completions', self.chat)
+        app.router.add_post('/v1/chat/completions', self.chat_completions)
 
         self.runner = web.AppRunner(app)
         await self.runner.setup()
@@ -84,15 +89,20 @@ class ActualGptServer(GptServer):
     async def _stop(self):
         await self.runner.cleanup()
 
+    def completions(self, matcher) -> SessionSetting:
+        session = ActualSessionSetting(matcher)
+        self.sessions.append(session)
+        return session
+
     def request(self, matcher) -> SessionSetting:
         session = ActualSessionSetting(matcher)
         self.sessions.append(session)
         return session
 
-    async def chat(self, request: web.Request):
+    async def chat_completions(self, request: web.Request):
         json_request = await request.json()
         await self.monitor.on_session_start(json_request)
-        chat_request = Request(json_request)
+        chat_request = Request(request.headers, json_request)
         context = ActualSessionContext(chat_request)
 
         matched_session = next((session for session in self.sessions if session.match(chat_request)), None)

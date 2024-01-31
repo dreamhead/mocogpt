@@ -1,11 +1,9 @@
-import json
 import os
 import sys
 
 import click
 
-from mocogpt.cli._args import StartArgs
-from mocogpt.cli._parser import parse
+from mocogpt.cli._runner import CliRunner
 
 
 @click.group()
@@ -21,13 +19,7 @@ def start(config, port):
         click.echo(f"Error: Config file {config} does not exist.")
         sys.exit(1)
 
-    # load config file
-    with open(config) as f:
-        settings = json.load(f)
-        args = StartArgs(port, settings)
-        server = parse(args)
-        server.start_server()
-
+    CliRunner().run(config, port)
 
 
 app.add_command(start)
