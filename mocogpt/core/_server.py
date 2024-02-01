@@ -5,7 +5,7 @@ from abc import ABC
 
 from aiohttp import web
 
-from mocogpt.core._base import GptServer, Request, SessionContext, SessionSetting
+from mocogpt.core._base import Chat, Completions, GptServer, Request, SessionContext, SessionSetting
 from mocogpt.core._sse import EventSourceResponse
 
 
@@ -43,8 +43,21 @@ class Monitor(ABC):
         pass
 
 
+class ActualCompletions(Completions):
+    def __init__(self):
+        super().__init__()
+        self.sessions = []
+
+    def on(self, matcher) -> SessionSetting:
+        session = ActualSessionSetting(matcher)
+        self.sessions.append(session)
+        return session
+
+
 class ActualGptServer(GptServer):
     def __init__(self, port, monitor: Monitor = Monitor()):
+        chat = Chat(ActualCompletions())
+        super().__init__(chat)
         self.runner = None
         self.thread = None
         self.loop = None
@@ -105,7 +118,8 @@ class ActualGptServer(GptServer):
         chat_request = Request(request.headers, json_request)
         context = ActualSessionContext(chat_request)
 
-        matched_session = next((session for session in self.sessions if session.match(chat_request)), None)
+        matched_session = next(
+            (session for session in self.chat.completions.sessions if session.match(chat_request)), None)
         if matched_session is None:
             return await self.default_response(request)
 

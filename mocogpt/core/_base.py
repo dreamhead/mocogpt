@@ -142,9 +142,24 @@ class SessionSetting:
         return self
 
 
-class GptServer(ABC):
-    def completions(self, matcher) -> SessionSetting:
+class Completions(ABC):
+    def on(self, matcher: RequestMatcher) -> SessionSetting:
         pass
 
-    def request(self, matcher) -> SessionSetting:
-        pass
+
+class Chat:
+    def __init__(self, completions: Completions):
+        self._completions = completions
+
+    @property
+    def completions(self) -> Completions:
+        return self._completions
+
+
+class GptServer(ABC):
+    def __init__(self, chat: Chat):
+        self._chat = chat
+
+    @property
+    def chat(self) -> Chat:
+        return self._chat

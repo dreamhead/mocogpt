@@ -7,7 +7,6 @@ class ConfigParser:
     def parse(self, cliargs):
         server = console_server(cliargs.port)
         for setting in cliargs.settings:
-
             self.bing_to(setting, server)
 
         return server
@@ -44,14 +43,14 @@ class ConfigParser:
         matcher = None
         handler = None
 
-        if 'completions' in setting:
-            matcher = self.create_matcher(setting['completions'])
+        if "chat.completions" in setting:
+            matcher = self.create_matcher(setting['chat.completions'])
 
         if 'response' in setting:
             handler = self.create_handler(setting['response'])
 
         if matcher is not None and handler is not None:
-            server.request(matcher).response(handler)
+            server.chat.completions.on(matcher).response(handler)
 
     def is_accepted_model(self, model_name) -> bool:
         return model_name in [

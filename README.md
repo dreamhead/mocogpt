@@ -21,7 +21,7 @@ from mocogpt import gpt_server, prompt, content
 
 def test_reply():
     server = gpt_server(12306)
-    server.completions(prompt("Hi")).response(content("How can I assist you?"))
+    server.chat.completions.on(prompt("Hi")).response(content("How can I assist you?"))
 
     with server:
         client = OpenAI(base_url="http://localhost:12306/v1", api_key="sk-123456789")
@@ -46,13 +46,13 @@ You can write your own configuration:
 ```json
 [
     {
-        "completions": {
+        "chat.completions": {
           "prompt": "Hi"
         },
         "response": {
           "content": "How can I assist you?"
         }
-  }
+    }
 ]
 ```
 (config.json)
