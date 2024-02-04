@@ -47,3 +47,11 @@ class TemperatureMatcher(RequestMatcher):
 
     def match(self, request: Request) -> bool:
         return request.temperature == self._temperature
+
+
+class EmbeddingsInputMatcher(RequestMatcher):
+    def __init__(self, _input: str):
+        self._input = _input
+
+    def match(self, request: Request) -> bool:
+        return request.input == self._input

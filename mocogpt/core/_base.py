@@ -47,6 +47,10 @@ class Request:
     def api_key(self) -> str:
         return self._headers['Authorization'].split('Bearer ')[1]
 
+    @property
+    def input(self) -> str:
+        return self._content['input']
+
 
 class Response:
     def __init__(self, model):
@@ -61,6 +65,20 @@ class Response:
             'model': self._model,
             'choices': self._choices()
         }
+
+    def to_embeddings(self):
+        return {
+          "object": "list",
+          "data": [
+            {
+              "object": "embedding",
+              "embedding": self.embedding,
+              "index": 0
+            }
+          ],
+          "model": self._model
+        }
+
 
     def _choices(self):
         choices = []
@@ -142,8 +160,26 @@ class SessionSetting:
         return self
 
 
+class RequestSession(ABC):
+    def request(self, matcher: RequestMatcher) -> SessionSetting:
+        pass
+
+
+class CompletionsSessionSetting(SessionSetting):
+    def __init__(self, matcher: RequestMatcher):
+        super().__init__(matcher)
+
+    def response(self, content: str | None = None):
+        pass
+
+
 class Completions(ABC):
-    def on(self, matcher: RequestMatcher) -> SessionSetting:
+    def request(self,
+                api_key: str | None = None,
+                prompt: str | None = None,
+                model: str | None = None,
+                temperature: float | None = None,
+                ) -> CompletionsSessionSetting:
         pass
 
 
@@ -156,10 +192,31 @@ class Chat:
         return self._completions
 
 
+class EmbeddingsSessionSetting(SessionSetting):
+    def __init__(self, matcher: RequestMatcher):
+        super().__init__(matcher)
+
+    def response(self, embeddings: list[float]):
+        pass
+
+
+class Embeddings(ABC):
+    def request(self,
+                api_key: str | None = None,
+                input: str | None = None,
+                ) -> EmbeddingsSessionSetting:
+        pass
+
+
 class GptServer(ABC):
-    def __init__(self, chat: Chat):
+    def __init__(self, chat: Chat, embeddings: Embeddings):
         self._chat = chat
+        self._embeddings = embeddings
 
     @property
     def chat(self) -> Chat:
         return self._chat
+
+    @property
+    def embeddings(self) -> Embeddings:
+        return self._embeddings

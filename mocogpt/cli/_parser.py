@@ -1,5 +1,3 @@
-from mocogpt import all_of, content, model, prompt, temperature
-
 from ._server import console_server
 
 
@@ -12,45 +10,47 @@ class ConfigParser:
         return server
 
     def create_matcher(self, request):
-        matchers = []
+        api_key = None
+        prompt = None
+        model = None
+        temperature = None
+        if "api_key" in request:
+            api_key = request['api_key']
+
         if "prompt" in request:
-            matchers.append(prompt(request['prompt']))
+            prompt = request['prompt']
 
         if "model" in request:
             _model = request['model']
             if self.is_accepted_model(_model):
-                matchers.append(model(_model))
+                model = _model
             else:
                 raise ValueError(f"Unsupported model: {_model}")
 
         if "temperature" in request:
-            matchers.append(temperature(request['temperature']))
+            temperature = request['temperature']
 
-        if len(matchers) == 1:
-            return matchers[0]
-
-        return all_of(*matchers)
+        return api_key, prompt, model, temperature
 
     def create_handler(self, response):
-        handlers = []
         if "content" in response:
-            handlers.append(content(response['content']))
+            return response['content']
 
-        if len(handlers) == 1:
-            return handlers[0]
+        return None
 
     def bing_to(self, setting, server):
-        matcher = None
-        handler = None
+        api_key, prompt, model, temperature = None, None, None, None
+        content = None
 
         if "chat.completions" in setting:
-            matcher = self.create_matcher(setting['chat.completions'])
+            api_key, prompt, model, temperature = self.create_matcher(setting['chat.completions'])
 
         if 'response' in setting:
-            handler = self.create_handler(setting['response'])
+            content = self.create_handler(setting['response'])
 
-        if matcher is not None and handler is not None:
-            server.chat.completions.on(matcher).response(handler)
+        (server.chat.completions
+         .request(api_key=api_key, prompt=prompt, model=model, temperature=temperature)
+         .response(content=content))
 
     def is_accepted_model(self, model_name) -> bool:
         return model_name in [

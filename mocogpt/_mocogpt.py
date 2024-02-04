@@ -1,5 +1,5 @@
 from .core._base import GptServer, RequestMatcher, ResponseHandler
-from .core._handler import ContentResponseHandler
+from .core._handler import ContentResponseHandler, EmbeddingsResponseHandler
 from .core._matcher import AllOfMatcher, AnyOfMatcher, ApiKeyMatcher, ModelMatcher, PromptMatcher, TemperatureMatcher
 from .core._server import ActualGptServer
 
@@ -34,3 +34,7 @@ def model(text: str) -> RequestMatcher:
 
 def temperature(temp: float) -> RequestMatcher:
     return TemperatureMatcher(temp)
+
+
+def embedding(data: list[float]) -> ResponseHandler:
+    return EmbeddingsResponseHandler(data)
