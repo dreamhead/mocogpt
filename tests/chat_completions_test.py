@@ -4,7 +4,7 @@ from openai import BadRequestError, OpenAI
 from mocogpt import gpt_server
 
 
-class TestMocoGPTChat:
+class TestChatCompletions:
     def test_should_reply_content_for_specified_prompt(self, client: OpenAI):
         server = gpt_server(12306)
         server.chat.completions.request(prompt="Hi").response(content="How can I assist you?")

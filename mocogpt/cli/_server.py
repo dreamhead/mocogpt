@@ -2,7 +2,7 @@ import sys
 
 from loguru import logger
 
-from mocogpt.core._server import ActualGptServer, Monitor
+from mocogpt.core.actual_server import ActualGptServer, Monitor
 
 logger.remove()
 logger.add(sys.stdout, colorize=True,
