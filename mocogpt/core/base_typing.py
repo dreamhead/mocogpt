@@ -4,7 +4,17 @@ from inspect import Parameter, Signature
 from typing import Generic, TypeVar
 
 
-class Request(ABC):
+class RequestMeta(type):
+    def __new__(cls, clsname, bases, clsdict):
+        _content_fields: list[str] = clsdict.get('_content_fields', [])
+        for field in _content_fields:
+            clsdict[field] = property(
+                lambda self, _field=field: self._content[_field] if _field in self._content else None)
+
+        return super().__new__(cls, clsname, bases, clsdict)
+
+
+class Request(metaclass=RequestMeta):
     def __init__(self, headers, content: dict):
         self._headers = headers
         self._content = content
@@ -73,33 +83,35 @@ def make_sig(*names) -> Signature:
     return Signature(parms)
 
 
-class EndpointMeta(type):
-    def __new__(cls, clsname, bases, clsdict):
-        clsdict['__request_sig__'] = make_sig(*clsdict.get('_request_params', []))
-        clsdict['__response_sig__'] = make_sig(*clsdict.get('_response_params', []))
-        return super().__new__(cls, clsname, bases, clsdict)
-
-
 class SessionSetting:
     def __init__(self, matcher: RequestMatcher, response_sig: Signature, create_handler):
         self._matcher = matcher
         self._handler = None
-        self.response_sig = response_sig
-        self.create_handler = create_handler
+        self._response_sig = response_sig
+        self._create_handler = create_handler
 
     def response(self, **kwargs):
-        self.response_sig.bind(**kwargs)
-        self._handler = self.create_handler(**kwargs)
+        self._response_sig.bind(**kwargs)
+        self._handler = self._create_handler(**kwargs)
+
+
+class EndpointMeta(type):
+    def __new__(cls, clsname, bases, clsdict):
+        request_params: dict = clsdict.get('_request_params', {})
+        clsdict['__request_sig__'] = make_sig(*request_params.keys())
+        response_params: dict = clsdict.get('_response_params', [])
+        clsdict['__response_sig__'] = make_sig(*response_params.keys())
+        return super().__new__(cls, clsname, bases, clsdict)
 
 
 class Endpoint(metaclass=EndpointMeta):
-    _matcher_classes = {}
-    _handler_classes = {}
+    _request_params = {}
+    _response_params = {}
 
     def __init__(self):
         self.sessions = []
-        self._create_matchers = partial(self._create_components, self._matcher_classes)
-        self._create_handlers = partial(self._create_components, self._handler_classes)
+        self._create_matchers = partial(self._create_components, self._request_params)
+        self._create_handlers = partial(self._create_components, self._response_params)
 
     def request(self, **kwargs) -> SessionSetting:
         self.__request_sig__.bind(**kwargs)

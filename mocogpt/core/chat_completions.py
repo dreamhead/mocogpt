@@ -9,13 +9,11 @@ from mocogpt.core.base_typing import Endpoint, Request, RequestMatcher, Response
 
 
 class CompletionsRequest(Request):
+    _content_fields = ['temperature']
+
     @property
     def prompt(self) -> str:
         return self._content['messages'][-1]['content']
-
-    @property
-    def temperature(self) -> float:
-        return self._content['temperature']
 
     @property
     def stream(self) -> bool:
@@ -126,15 +124,13 @@ class ContentResponseHandler(ResponseHandler[CompletionsResponse]):
 
 
 class Completions(Endpoint):
-    _request_params = ['api_key', 'prompt', 'model', 'temperature']
-    _response_params = ['content']
-    _matcher_classes = {
+    _request_params = {
         'api_key': ApiKeyMatcher,
         'model': ModelMatcher,
         'prompt': PromptMatcher,
         'temperature': TemperatureMatcher
     }
-    _handler_classes = {
+    _response_params = {
         'content': ContentResponseHandler
     }
 

@@ -1,14 +1,11 @@
+from typing import Literal
+
 from mocogpt.core.base_matcher import ApiKeyMatcher, ModelMatcher
 from mocogpt.core.base_typing import Endpoint, Request, RequestMatcher, Response, ResponseHandler, SessionContext
 
 
 class EmbeddingsRequest(Request):
-    def __init__(self, headers, content: dict):
-        super().__init__(headers, content)
-
-    @property
-    def input(self) -> str:
-        return self._content['input']
+    _content_fields = ['input', 'encoding_format']
 
 
 class EmbeddingsResponse(Response):
@@ -46,6 +43,14 @@ class InputMatcher(RequestMatcher[EmbeddingsRequest]):
         return request.input == self._input
 
 
+class EncodingFormatMatcher(RequestMatcher[EmbeddingsRequest]):
+    def __init__(self, encoding_format: Literal["float", "base64"]):
+        self._encoding_format = encoding_format
+
+    def match(self, request: EmbeddingsRequest) -> bool:
+        return request.encoding_format == self._encoding_format
+
+
 class EmbeddingsResponseHandler(ResponseHandler[EmbeddingsResponse]):
     def __init__(self, embedding: list[float]):
         self._embedding = embedding
@@ -55,13 +60,12 @@ class EmbeddingsResponseHandler(ResponseHandler[EmbeddingsResponse]):
 
 
 class Embeddings(Endpoint):
-    _request_params = ['api_key', 'model', 'input']
-    _response_params = ['embeddings']
-    _matcher_classes = {
+    _request_params = {
         'api_key': ApiKeyMatcher,
         'model': ModelMatcher,
-        'input': InputMatcher
+        'input': InputMatcher,
+        'encoding_format': EncodingFormatMatcher,
     }
-    _handler_classes = {
+    _response_params = {
         'embeddings': EmbeddingsResponseHandler
     }
