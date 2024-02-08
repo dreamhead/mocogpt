@@ -4,6 +4,24 @@ from inspect import Parameter, Signature
 from typing import Generic, TypeVar
 
 
+class AnyOf:
+    def __init__(self, *args):
+        self._args = args
+
+    @property
+    def values(self):
+        return self._args
+
+
+class NoneOf:
+    def __init__(self, *args):
+        self.args = args
+
+    @property
+    def values(self):
+        return self.args
+
+
 class RequestMeta(type):
     def __new__(cls, clsname, bases, clsdict):
         _content_fields: list[str] = clsdict.get('_content_fields', [])
@@ -62,6 +80,22 @@ class AllOfMatcher(RequestMatcher):
         return all(matcher.match(request) for matcher in self.matchers)
 
 
+class AnyOfMatcher(RequestMatcher):
+    def __init__(self, matchers: list[RequestMatcher]):
+        self.matchers = matchers
+
+    def match(self, request: Request) -> bool:
+        return any(matcher.match(request) for matcher in self.matchers)
+
+
+class NoneOfMatcher(RequestMatcher):
+    def __init__(self, matchers: list[RequestMatcher]):
+        self.matchers = matchers
+
+    def match(self, request: Request) -> bool:
+        return not any(matcher.match(request) for matcher in self.matchers)
+
+
 class ResponseHandler(Generic[R], ABC):
     @abstractmethod
     def write_response(self, context: SessionContext):
@@ -84,14 +118,19 @@ def make_sig(*names) -> Signature:
 
 
 class SessionSetting:
-    def __init__(self, matcher: RequestMatcher, response_sig: Signature, create_handler):
+    def __init__(self, matcher: RequestMatcher,
+                 create_matcher,
+                 create_handler):
         self._matcher = matcher
         self._handler = None
-        self._response_sig = response_sig
         self._create_handler = create_handler
+        self._create_matcher = create_matcher
+
+    def or_request(self, **kwargs):
+        self._matcher = AnyOfMatcher([self._matcher, self._create_matcher(**kwargs)])
+        return self
 
     def response(self, **kwargs):
-        self._response_sig.bind(**kwargs)
         self._handler = self._create_handler(**kwargs)
 
 
@@ -110,23 +149,28 @@ class Endpoint(metaclass=EndpointMeta):
 
     def __init__(self):
         self.sessions = []
-        self._create_matchers = partial(self._create_components, self._request_params)
-        self._create_handlers = partial(self._create_components, self._response_params)
+        self._create_matchers = partial(self._create_components, self.__request_sig__, self._request_params)
+        self._create_handlers = partial(self._create_components, self.__response_sig__, self._response_params)
 
     def request(self, **kwargs) -> SessionSetting:
-        self.__request_sig__.bind(**kwargs)
         matcher = self._create_matchers(**kwargs)
-        session = SessionSetting(matcher, self.__response_sig__, self._create_handlers)
+        session = SessionSetting(matcher, self._create_matchers, self._create_handlers)
         self.sessions.append(session)
         return session
 
-    def _create_components(self, component_classes: dict, **kwargs):
-        components: list = []
+    def _create_component(self, Component, value):
+        if isinstance(value, AnyOf):
+            return AnyOfMatcher([Component(value) for value in value.values])
 
-        for param, Component in component_classes.items():
-            value = kwargs.get(param)
-            if value:
-                components.append(Component(value))
+        if isinstance(value, NoneOf):
+            return NoneOfMatcher([Component(value) for value in value.values])
+
+        return Component(value)
+
+    def _create_components(self, sig: Signature, component_classes: dict, **kwargs):
+        sig.bind(**kwargs)
+        components = [self._create_component(Component, value)
+                      for param, Component in component_classes.items() if (value := kwargs.get(param))]
 
         if len(components) == 0:
             raise ValueError('No components specified')
