@@ -21,7 +21,7 @@ loguru = {version = "^0.7.2", extras = ["cli"]}
 cli = ["click", "loguru"]
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.1.15"
+ruff = "^0.2.1"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.0.0"
@@ -37,7 +37,7 @@ testpaths = [
 line-length = 120
 target-version = "py311"
 
-select = [
+lint.select = [
   "E",  # pycodestyle
   "F",  # pyflakes
   "UP", # pyupgrade,
