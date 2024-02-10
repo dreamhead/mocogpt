@@ -1,28 +1,21 @@
-[
-  {
-    "chat.completions": {
-      "prompt": "Hi"
+{
+  "chat.completions": [
+    {
+      "request": {
+        "prompt": "Hi"
+      },
+      "response": {
+        "content": "How can I assist you?"
+      }
     },
-    "response": {
-      "content": "How can I assist you?"
+    {
+      "request": {
+        "prompt": "Hello",
+        "model": "gpt-4"
+      },
+      "response": {
+        "content": "How can I assist you?"
+      }
     }
-  },
-  {
-    "chat.completions": {
-      "prompt": "Hello",
-      "model": "gpt-4"
-    },
-    "response": {
-      "content": "How can I assist you?"
-    }
-  },
-  {
-    "chat.completions": {
-      "prompt": "Hello",
-      "temperature": 1.0
-    },
-    "response": {
-      "content": "How can I assist you?"
-    }
-  }
-]
+  ]
+}

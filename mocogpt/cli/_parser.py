@@ -1,11 +1,11 @@
+from ._args import StartArgs
 from ._server import console_server
 
 
 class ConfigParser:
-    def parse(self, cliargs):
+    def parse(self, cliargs: StartArgs):
         server = console_server(cliargs.port)
-        for setting in cliargs.settings:
-            self.bing_to(setting, server)
+        self.bing_to(cliargs.settings, server)
 
         return server
 
@@ -42,15 +42,18 @@ class ConfigParser:
         api_key, prompt, model, temperature = None, None, None, None
         content = None
 
+        print(setting)
+
         if "chat.completions" in setting:
-            api_key, prompt, model, temperature = self.create_matcher(setting['chat.completions'])
-
-        if 'response' in setting:
-            content = self.create_handler(setting['response'])
-
-        (server.chat.completions
-         .request(api_key=api_key, prompt=prompt, model=model, temperature=temperature)
-         .response(content=content))
+            chat_completions_setting = setting['chat.completions']
+            for setting in chat_completions_setting:
+                if 'request' in setting:
+                    api_key, prompt, model, temperature = self.create_matcher(setting['request'])
+                if 'response' in setting:
+                    content = self.create_handler(setting['response'])
+                (server.chat.completions
+                 .request(api_key=api_key, prompt=prompt, model=model, temperature=temperature)
+                 .response(content=content))
 
     def is_accepted_model(self, model_name) -> bool:
         return model_name in [
