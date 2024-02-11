@@ -6,7 +6,6 @@ class ConfigParser:
     def parse(self, cliargs: StartArgs):
         server = console_server(cliargs.port)
         self.bing_to(cliargs.settings, server)
-
         return server
 
     def create_matcher(self, request):
@@ -39,21 +38,21 @@ class ConfigParser:
         return None
 
     def bing_to(self, setting, server):
+        if "chat.completions" in setting:
+            self.bing_chat_completion(setting['chat.completions'], server)
+
+    def bing_chat_completion(self, settings, server):
         api_key, prompt, model, temperature = None, None, None, None
         content = None
 
-        print(setting)
-
-        if "chat.completions" in setting:
-            chat_completions_setting = setting['chat.completions']
-            for setting in chat_completions_setting:
-                if 'request' in setting:
-                    api_key, prompt, model, temperature = self.create_matcher(setting['request'])
-                if 'response' in setting:
-                    content = self.create_handler(setting['response'])
-                (server.chat.completions
-                 .request(api_key=api_key, prompt=prompt, model=model, temperature=temperature)
-                 .response(content=content))
+        for setting in settings:
+            if 'request' in setting:
+                api_key, prompt, model, temperature = self.create_matcher(setting['request'])
+            if 'response' in setting:
+                content = self.create_handler(setting['response'])
+            (server.chat.completions
+             .request(api_key=api_key, prompt=prompt, model=model, temperature=temperature)
+             .response(content=content))
 
     def is_accepted_model(self, model_name) -> bool:
         return model_name in [
