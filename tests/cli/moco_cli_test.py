@@ -7,7 +7,7 @@ from mocogpt.cli.app import __file__ as app_file
 class TestMocoGPTCli:
     def test_should_run_with_prompt(self, client):
         current_directory = os.path.dirname(os.path.abspath(__file__))
-        config_file = os.path.join(current_directory, "config.json")
+        config_file = os.path.join(current_directory, "chat_completions_config.json")
         service_process = subprocess.Popen(
             ["python", app_file,
              "start", config_file,
@@ -25,7 +25,7 @@ class TestMocoGPTCli:
 
     def test_should_run_with_model_and_prompt(self, client):
         current_directory = os.path.dirname(os.path.abspath(__file__))
-        config_file = os.path.join(current_directory, "config.json")
+        config_file = os.path.join(current_directory, "chat_completions_config.json")
         service_process = subprocess.Popen(
             ["python", app_file,
              "start", config_file,
@@ -42,7 +42,7 @@ class TestMocoGPTCli:
 
     def test_should_run_with_temp_and_prompt(self, client):
         current_directory = os.path.dirname(os.path.abspath(__file__))
-        config_file = os.path.join(current_directory, "config.json")
+        config_file = os.path.join(current_directory, "chat_completions_config.json")
         service_process = subprocess.Popen(
             ["python", app_file,
              "start", config_file,
