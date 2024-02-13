@@ -17,7 +17,7 @@ You can use MocoGPT as a library as following:
 
 ```python
 from openai import OpenAI
-from mocogpt import gpt_server, prompt, content
+from mocogpt import gpt_server
 
 def test_reply():
     server = gpt_server(12306)
@@ -44,16 +44,19 @@ MocoGPT can be run as a standalone server.
 
 You can write your own configuration:
 ```json
-[
-    {
-        "chat.completions": {
+{
+    "chat.completions": [
+      {
+        "request": {
           "prompt": "Hi"
         },
         "response": {
           "content": "How can I assist you?"
         }
-    }
-]
+      }
+    ]
+}
+
 ```
 (config.json)
     
