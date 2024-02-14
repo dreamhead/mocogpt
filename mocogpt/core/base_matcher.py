@@ -10,7 +10,12 @@ class ApiKeyMatcher(RequestMatcher[Request]):
 
 
 class ModelMatcher(RequestMatcher[Request]):
+    accepted_models = []
+
     def __init__(self, model: str):
+        if model not in self.accepted_models:
+            raise ValueError(f"Model {model} not in accepted models")
+
         self.model = model
 
     def match(self, request: Request) -> bool:

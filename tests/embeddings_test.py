@@ -1,3 +1,4 @@
+import pytest
 from openai import OpenAI
 
 from mocogpt import gpt_server
@@ -294,3 +295,8 @@ class TestMocoGPTChat:
             )
 
             assert response.data[0].embedding[0] == 0.002253932
+
+    def test_should_raise_exception_for_unknown_models(self):
+        server = gpt_server(12306)
+        with pytest.raises(ValueError):
+            server.chat.completions.request(model="text-embedding-unknown").response(content="How can I assist you?")

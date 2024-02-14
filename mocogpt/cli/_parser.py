@@ -117,5 +117,8 @@ class ConfigParser:
         ]
 
     def is_accepted_embeddings_model(self, model_name) -> bool:
-        return True
-
+        return model_name in [
+            "text-embedding-ada-002",
+            "text-embedding-3-small",
+            "text-embedding-3-large"
+        ]

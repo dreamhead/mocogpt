@@ -35,6 +35,14 @@ class EmbeddingsResponse(Response):
         }
 
 
+class EmbeddingsModelMatcher(ModelMatcher):
+    accepted_models = [
+        "text-embedding-ada-002",
+        "text-embedding-3-small",
+        "text-embedding-3-large"
+    ]
+
+
 class InputMatcher(RequestMatcher[EmbeddingsRequest]):
     def __init__(self, input: str):
         self._input = input
@@ -62,7 +70,7 @@ class EmbeddingsResponseHandler(ResponseHandler[EmbeddingsResponse]):
 class Embeddings(Endpoint):
     _request_params = {
         'api_key': ApiKeyMatcher,
-        'model': ModelMatcher,
+        'model': EmbeddingsModelMatcher,
         'input': InputMatcher,
         'encoding_format': EncodingFormatMatcher,
     }

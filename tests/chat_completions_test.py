@@ -159,3 +159,9 @@ class TestChatCompletions:
 
         with pytest.raises(TypeError):
             server.chat.completions.request(prompt="Hi").response(unknown="Hi")
+
+    def test_should_raise_exception_for_unknown_models(self):
+        server = gpt_server(12306)
+        with pytest.raises(ValueError):
+            server.chat.completions.request(model="gpt-4-unknown").response(content="How can I assist you?")
+
