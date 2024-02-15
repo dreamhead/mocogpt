@@ -20,11 +20,7 @@ class ConfigParser:
             prompt = request['prompt']
 
         if "model" in request:
-            _model = request['model']
-            if self.is_accepted_completions_model(_model):
-                model = _model
-            else:
-                raise ValueError(f"Unsupported model: {_model}")
+            model = request['model']
 
         if "temperature" in request:
             temperature = request['temperature']
@@ -79,11 +75,7 @@ class ConfigParser:
             api_key = request['api_key']
 
         if "model" in request:
-            _model = request['model']
-            if self.is_accepted_embeddings_model(_model):
-                model = _model
-            else:
-                raise ValueError(f"Unsupported model: {_model}")
+            model = request['model']
 
         if "input" in request:
             _input = request['input']
@@ -95,30 +87,3 @@ class ConfigParser:
             return response["embeddings"]
 
         return None
-
-    def is_accepted_completions_model(self, model_name) -> bool:
-        return model_name in [
-            "gpt-4-0125-preview",
-            "gpt-4-turbo-preview",
-            "gpt-4-1106-preview",
-            "gpt-4-vision-preview",
-            "gpt-4",
-            "gpt-4-0314",
-            "gpt-4-0613",
-            "gpt-4-32k",
-            "gpt-4-32k-0314",
-            "gpt-4-32k-0613",
-            "gpt-3.5-turbo",
-            "gpt-3.5-turbo-16k",
-            "gpt-3.5-turbo-0301",
-            "gpt-3.5-turbo-0613",
-            "gpt-3.5-turbo-1106",
-            "gpt-3.5-turbo-16k-0613"
-        ]
-
-    def is_accepted_embeddings_model(self, model_name) -> bool:
-        return model_name in [
-            "text-embedding-ada-002",
-            "text-embedding-3-small",
-            "text-embedding-3-large"
-        ]
