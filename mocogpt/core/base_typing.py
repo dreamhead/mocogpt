@@ -153,6 +153,7 @@ class Endpoint(metaclass=EndpointMeta):
         self._create_handlers = partial(self._create_components, self.__response_sig__, self._response_params)
 
     def request(self, **kwargs) -> SessionSetting:
+        print(kwargs)
         matcher = self._create_matchers(**kwargs)
         session = SessionSetting(matcher, self._create_matchers, self._create_handlers)
         self.sessions.append(session)
