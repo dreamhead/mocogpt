@@ -24,7 +24,7 @@ cli = ["click", "loguru"]
 ruff = "^0.2.1"
 
 [tool.poetry.group.test.dependencies]
-pytest = "^8.0.0"
+pytest = "^8.0.1"
 openai = "^1.10.0"
 pytest-cov = "^4.1.0"
 
