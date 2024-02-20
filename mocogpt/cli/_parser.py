@@ -65,6 +65,15 @@ class EmbeddingsBinder:
         if "input" in request:
             matcher["input"] = request['input']
 
+        if "encoding_format" in request:
+            matcher["encoding_format"] = request['encoding_format']
+
+        if "dimensions" in request:
+            matcher["dimensions"] = request['dimensions']
+
+        if "user" in request:
+            matcher["user"] = request['user']
+
         return matcher
 
     def create_handler(self, response):

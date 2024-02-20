@@ -5,7 +5,7 @@ from mocogpt.core.base_typing import Endpoint, Request, RequestMatcher, Response
 
 
 class EmbeddingsRequest(Request):
-    _content_fields = ['input', 'encoding_format']
+    _content_fields = ['input', 'encoding_format', 'dimensions', 'user']
 
 
 class EmbeddingsResponse(Response):
@@ -44,8 +44,8 @@ class EmbeddingsModelMatcher(ModelMatcher):
 
 
 class InputMatcher(RequestMatcher[EmbeddingsRequest]):
-    def __init__(self, input: str):
-        self._input = input
+    def __init__(self, _input: str):
+        self._input = _input
 
     def match(self, request: EmbeddingsRequest) -> bool:
         return request.input == self._input
@@ -57,6 +57,22 @@ class EncodingFormatMatcher(RequestMatcher[EmbeddingsRequest]):
 
     def match(self, request: EmbeddingsRequest) -> bool:
         return request.encoding_format == self._encoding_format
+
+
+class DimensionsMatcher(RequestMatcher[EmbeddingsRequest]):
+    def __init__(self, dimensions: int):
+        self._dimensions = dimensions
+
+    def match(self, request: EmbeddingsRequest) -> bool:
+        return request.dimensions == self._dimensions
+
+
+class UserMatcher(RequestMatcher[EmbeddingsRequest]):
+    def __init__(self, user: str):
+        self._user = user
+
+    def match(self, request: EmbeddingsRequest) -> bool:
+        return request.user == self._user
 
 
 class EmbeddingsResponseHandler(ResponseHandler[EmbeddingsResponse]):
@@ -73,6 +89,8 @@ class Embeddings(Endpoint):
         'model': EmbeddingsModelMatcher,
         'input': InputMatcher,
         'encoding_format': EncodingFormatMatcher,
+        'dimensions': DimensionsMatcher,
+        'user': UserMatcher
     }
     _response_params = {
         'embeddings': EmbeddingsResponseHandler

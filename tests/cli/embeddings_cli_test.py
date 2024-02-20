@@ -18,7 +18,9 @@ class TestMocoEmbeddingsCli:
             response = client.embeddings.create(
                 model="text-embedding-ada-002",
                 input="Hi",
-                encoding_format="float"
+                encoding_format="float",
+                dimensions=1536,
+                user="user123456"
             )
 
             assert response.data[0].embedding[0] == 0.002253932

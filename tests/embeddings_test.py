@@ -296,6 +296,36 @@ class TestMocoGPTChat:
 
             assert response.data[0].embedding[0] == 0.002253932
 
+    def test_should_reply_embeddings_for_specified_dimensions(self, client: OpenAI):
+        server = gpt_server(12306)
+        server.embeddings.request(input="Hi", dimensions=1536).response(
+            embeddings=self.embeddings)
+
+        with server:
+            response = client.embeddings.create(
+                model="text-embedding-ada-002",
+                input="Hi",
+                encoding_format="float",
+                dimensions=1536
+            )
+
+            assert response.data[0].embedding[0] == 0.002253932
+
+    def test_should_reply_embeddings_for_specified_user(self, client: OpenAI):
+        server = gpt_server(12306)
+        server.embeddings.request(input="Hi", user="user123456").response(
+            embeddings=self.embeddings)
+
+        with server:
+            response = client.embeddings.create(
+                model="text-embedding-ada-002",
+                input="Hi",
+                encoding_format="float",
+                user="user123456"
+            )
+
+            assert response.data[0].embedding[0] == 0.002253932
+
     def test_should_raise_exception_for_unknown_models(self):
         server = gpt_server(12306)
         with pytest.raises(ValueError):

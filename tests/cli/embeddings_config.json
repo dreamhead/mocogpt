@@ -2,7 +2,11 @@
   "embeddings": [
     {
       "request": {
-        "input": "Hi"
+        "input": "Hi",
+        "model": "text-embedding-ada-002",
+        "encoding_format": "float",
+        "dimensions": 1536,
+        "user": "user123456"
       },
       "response": {
         "embeddings": [0.002253932, -0.009333183, 0.01574578, -0.007790351, -0.004711035, 0.014844206, -0.009739526,
