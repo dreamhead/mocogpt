@@ -104,7 +104,7 @@ class ActualGptServer(GptServer):
         json_request = await request.json()
         await self.monitor.on_session_start(json_request)
         chat_request = CompletionsRequest(request.headers, json_request)
-        response = CompletionsResponse(chat_request.model)
+        response = CompletionsResponse(chat_request.model, chat_request.prompt_tokens())
         context = SessionContext(chat_request, response)
 
         matched_session = next(
