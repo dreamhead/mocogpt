@@ -16,6 +16,9 @@ class TestChatCompletions:
             )
 
             assert response.choices[0].message.content == "How can I assist you?"
+            assert response.usage.prompt_tokens >= 0
+            assert response.usage.completion_tokens >= 0
+            assert response.usage.total_tokens >= 0
 
     def test_should_reply_content_for_specified_prompt_in_stream(self, client: OpenAI):
         server = gpt_server(12306)
