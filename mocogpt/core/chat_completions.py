@@ -13,7 +13,7 @@ def count_tokens(model: str, content: str) -> int:
 
 
 class CompletionsRequest(Request):
-    _content_fields = ['temperature']
+    _content_fields = ['temperature', 'max_tokens']
 
     @property
     def prompt(self) -> str:
@@ -154,6 +154,14 @@ class TemperatureMatcher(RequestMatcher[CompletionsRequest]):
         return request.temperature == self._temperature
 
 
+class MaxTokensMatcher(RequestMatcher[CompletionsRequest]):
+    def __init__(self, max_tokens: int):
+        self._max_tokens = max_tokens
+
+    def match(self, request: CompletionsRequest) -> bool:
+        return request.max_tokens == self._max_tokens
+
+
 class ContentResponseHandler(ResponseHandler[CompletionsResponse]):
     def __init__(self, content: str):
         self.content = content
@@ -167,7 +175,8 @@ class Completions(Endpoint):
         'api_key': ApiKeyMatcher,
         'model': ChatCompletionModelMatcher,
         'prompt': PromptMatcher,
-        'temperature': TemperatureMatcher
+        'temperature': TemperatureMatcher,
+        'max_tokens': MaxTokensMatcher
     }
     _response_params = {
         'content': ContentResponseHandler
