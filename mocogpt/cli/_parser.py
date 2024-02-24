@@ -30,6 +30,12 @@ class ChatCompletionsBinder:
         if "temperature" in request:
             matcher['temperature'] = request['temperature']
 
+        if "max_tokens" in request:
+            matcher['max_tokens'] = request['max_tokens']
+
+        if "user" in request:
+            matcher['user'] = request['user']
+
         return matcher
 
     def create_handler(self, response):
