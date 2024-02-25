@@ -4,10 +4,9 @@ from ._server import console_server
 
 class ChatCompletionsBinder:
     def bind(self, settings, server):
-        matcher = {}
-        handler = {}
-
         for setting in settings:
+            matcher = {}
+            handler = {}
             if 'request' in setting:
                 matcher = self.create_matcher(setting['request'])
             if 'response' in setting:
@@ -16,7 +15,7 @@ class ChatCompletionsBinder:
              .request(**matcher)
              .response(**handler))
 
-    def create_matcher(self, request):
+    def create_matcher(self, request) -> dict:
         matcher = {}
         if "api_key" in request:
             matcher['api_key'] = request['api_key']
@@ -38,7 +37,7 @@ class ChatCompletionsBinder:
 
         return matcher
 
-    def create_handler(self, response):
+    def create_handler(self, response) -> dict:
         if "content" in response:
             return {"content": response['content']}
 
