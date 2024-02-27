@@ -13,7 +13,7 @@ def count_tokens(model: str, content: str) -> int:
 
 
 class CompletionsRequest(Request):
-    _content_fields = ['temperature', 'max_tokens', 'user']
+    _content_fields = ['temperature', 'max_tokens', 'user', 'stop']
 
     @property
     def prompt(self) -> str:
@@ -161,12 +161,20 @@ class MaxTokensMatcher(RequestMatcher[CompletionsRequest]):
     def match(self, request: CompletionsRequest) -> bool:
         return request.max_tokens == self._max_tokens
 
+
 class UserMatcher(RequestMatcher[CompletionsRequest]):
     def __init__(self, user: str):
         self._user = user
 
     def match(self, request: CompletionsRequest) -> bool:
         return request.user == self._user
+
+class StopMatcher(RequestMatcher[CompletionsRequest]):
+    def __init__(self, stop: str):
+        self._stop = stop
+
+    def match(self, request: CompletionsRequest) -> bool:
+        return request.stop == self._stop
 
 
 class ContentResponseHandler(ResponseHandler[CompletionsResponse]):
@@ -184,7 +192,8 @@ class Completions(Endpoint):
         'prompt': PromptMatcher,
         'temperature': TemperatureMatcher,
         'max_tokens': MaxTokensMatcher,
-        'user': UserMatcher
+        'user': UserMatcher,
+        'stop': StopMatcher,
     }
     _response_params = {
         'content': ContentResponseHandler
