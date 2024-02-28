@@ -4,8 +4,7 @@ import time
 
 import tiktoken
 
-from mocogpt.core.base_matcher import ApiKeyMatcher, ModelMatcher
-from mocogpt.core.base_typing import Endpoint, Request, RequestMatcher, Response, ResponseHandler, SessionContext
+from mocogpt.core.base_typing import Endpoint, Request, Response, ResponseHandler, SessionContext, extractor_class
 
 
 def count_tokens(model: str, content: str) -> int:
@@ -117,66 +116,6 @@ class CompletionsResponse(Response):
                 }
 
 
-class ChatCompletionModelMatcher(ModelMatcher):
-    accepted_models = [
-        "gpt-4-0125-preview",
-        "gpt-4-turbo-preview",
-        "gpt-4-1106-preview",
-        "gpt-4-vision-preview",
-        "gpt-4",
-        "gpt-4-0314",
-        "gpt-4-0613",
-        "gpt-4-32k",
-        "gpt-4-32k-0314",
-        "gpt-4-32k-0613",
-        "gpt-3.5-turbo",
-        "gpt-3.5-turbo-16k",
-        "gpt-3.5-turbo-0301",
-        "gpt-3.5-turbo-0613",
-        "gpt-3.5-turbo-1106",
-        "gpt-3.5-turbo-16k-0613"
-    ]
-
-
-class PromptMatcher(RequestMatcher[CompletionsRequest]):
-    def __init__(self, prompt: str):
-        self.prompt = prompt
-
-    def match(self, request: CompletionsRequest) -> bool:
-        return request.prompt == self.prompt
-
-
-class TemperatureMatcher(RequestMatcher[CompletionsRequest]):
-    def __init__(self, temperature: float):
-        self._temperature = temperature
-
-    def match(self, request: CompletionsRequest) -> bool:
-        return request.temperature == self._temperature
-
-
-class MaxTokensMatcher(RequestMatcher[CompletionsRequest]):
-    def __init__(self, max_tokens: int):
-        self._max_tokens = max_tokens
-
-    def match(self, request: CompletionsRequest) -> bool:
-        return request.max_tokens == self._max_tokens
-
-
-class UserMatcher(RequestMatcher[CompletionsRequest]):
-    def __init__(self, user: str):
-        self._user = user
-
-    def match(self, request: CompletionsRequest) -> bool:
-        return request.user == self._user
-
-class StopMatcher(RequestMatcher[CompletionsRequest]):
-    def __init__(self, stop: str):
-        self._stop = stop
-
-    def match(self, request: CompletionsRequest) -> bool:
-        return request.stop == self._stop
-
-
 class ContentResponseHandler(ResponseHandler[CompletionsResponse]):
     def __init__(self, content: str):
         self.content = content
@@ -187,13 +126,13 @@ class ContentResponseHandler(ResponseHandler[CompletionsResponse]):
 
 class Completions(Endpoint):
     _request_params = {
-        'api_key': ApiKeyMatcher,
-        'model': ChatCompletionModelMatcher,
-        'prompt': PromptMatcher,
-        'temperature': TemperatureMatcher,
-        'max_tokens': MaxTokensMatcher,
-        'user': UserMatcher,
-        'stop': StopMatcher,
+        'api_key': extractor_class('api_key'),
+        'model': extractor_class('model'),
+        'prompt': extractor_class('prompt'),
+        'temperature': extractor_class('temperature'),
+        'max_tokens': extractor_class('max_tokens'),
+        'user': extractor_class('user'),
+        'stop': extractor_class('stop'),
     }
     _response_params = {
         'content': ContentResponseHandler

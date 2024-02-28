@@ -1,7 +1,4 @@
-from typing import Literal
-
-from mocogpt.core.base_matcher import ApiKeyMatcher, ModelMatcher
-from mocogpt.core.base_typing import Endpoint, Request, RequestMatcher, Response, ResponseHandler, SessionContext
+from mocogpt.core.base_typing import Endpoint, Request, Response, ResponseHandler, SessionContext, extractor_class
 
 
 class EmbeddingsRequest(Request):
@@ -35,46 +32,6 @@ class EmbeddingsResponse(Response):
         }
 
 
-class EmbeddingsModelMatcher(ModelMatcher):
-    accepted_models = [
-        "text-embedding-ada-002",
-        "text-embedding-3-small",
-        "text-embedding-3-large"
-    ]
-
-
-class InputMatcher(RequestMatcher[EmbeddingsRequest]):
-    def __init__(self, _input: str):
-        self._input = _input
-
-    def match(self, request: EmbeddingsRequest) -> bool:
-        return request.input == self._input
-
-
-class EncodingFormatMatcher(RequestMatcher[EmbeddingsRequest]):
-    def __init__(self, encoding_format: Literal["float", "base64"]):
-        self._encoding_format = encoding_format
-
-    def match(self, request: EmbeddingsRequest) -> bool:
-        return request.encoding_format == self._encoding_format
-
-
-class DimensionsMatcher(RequestMatcher[EmbeddingsRequest]):
-    def __init__(self, dimensions: int):
-        self._dimensions = dimensions
-
-    def match(self, request: EmbeddingsRequest) -> bool:
-        return request.dimensions == self._dimensions
-
-
-class UserMatcher(RequestMatcher[EmbeddingsRequest]):
-    def __init__(self, user: str):
-        self._user = user
-
-    def match(self, request: EmbeddingsRequest) -> bool:
-        return request.user == self._user
-
-
 class EmbeddingsResponseHandler(ResponseHandler[EmbeddingsResponse]):
     def __init__(self, embedding: list[float]):
         self._embedding = embedding
@@ -85,12 +42,12 @@ class EmbeddingsResponseHandler(ResponseHandler[EmbeddingsResponse]):
 
 class Embeddings(Endpoint):
     _request_params = {
-        'api_key': ApiKeyMatcher,
-        'model': EmbeddingsModelMatcher,
-        'input': InputMatcher,
-        'encoding_format': EncodingFormatMatcher,
-        'dimensions': DimensionsMatcher,
-        'user': UserMatcher
+        'api_key': extractor_class('api_key'),
+        'model': extractor_class('model'),
+        'input': extractor_class('input'),
+        'encoding_format': extractor_class('encoding_format'),
+        'dimensions': extractor_class('dimensions'),
+        'user': extractor_class('user')
     }
     _response_params = {
         'embeddings': EmbeddingsResponseHandler

@@ -96,6 +96,21 @@ class NoneOfMatcher(RequestMatcher):
         return not any(matcher.match(request) for matcher in self.matchers)
 
 
+class RequestExtractor(Generic[T], ABC):
+    @abstractmethod
+    def extract(self, request: T):
+        pass
+
+
+class EqualsMatcher(RequestMatcher):
+    def __init__(self, extractor: RequestExtractor, value):
+        self.extractor = extractor
+        self._value = value
+
+    def match(self, request: Request) -> bool:
+        return self.extractor.extract(request) == self._value
+
+
 class ResponseHandler(Generic[R], ABC):
     @abstractmethod
     def write_response(self, context: SessionContext):
@@ -158,12 +173,18 @@ class Endpoint(metaclass=EndpointMeta):
         self.sessions.append(session)
         return session
 
-    def _create_component(self, Component, value):
+    def _create_component(self, Component: type, value):
         if isinstance(value, AnyOf):
-            return AnyOfMatcher([Component(value) for value in value.values])
+            return AnyOfMatcher([self._do_create_component(Component, value) for value in value.values])
 
         if isinstance(value, NoneOf):
-            return NoneOfMatcher([Component(value) for value in value.values])
+            return NoneOfMatcher([self._do_create_component(Component, value) for value in value.values])
+
+        return self._do_create_component(Component, value)
+
+    def _do_create_component(self, Component, value):
+        if issubclass(Component, RequestExtractor):
+            return EqualsMatcher(Component(), value)
 
         return Component(value)
 
@@ -179,3 +200,23 @@ class Endpoint(metaclass=EndpointMeta):
             return components[0]
 
         return AllOfMatcher(components) if isinstance(components[0], RequestMatcher) else AllOfHandler(components)
+
+
+def to_class_name(word):
+    return ''.join(x.capitalize() or '_' for x in word.split('_'))
+
+
+extractors = {}
+
+
+def extractor_class(name):
+    global extractors
+    if name in extractors:
+        return extractors[name]
+
+    clazz = type(to_class_name(name) + 'Extractor', (RequestExtractor,), {
+        'extract': lambda self, request: getattr(request, name.lower())
+    })
+
+    extractors[name] = clazz
+    return clazz
