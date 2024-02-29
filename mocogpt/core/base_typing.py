@@ -22,6 +22,15 @@ class NoneOf:
         return self.args
 
 
+class Contains:
+    def __init__(self, arg):
+        self._arg = arg
+
+    @property
+    def value(self):
+        return self._arg
+
+
 class RequestMeta(type):
     def __new__(cls, clsname, bases, clsdict):
         _content_fields: list[str] = clsdict.get('_content_fields', [])
@@ -111,6 +120,15 @@ class EqualsMatcher(RequestMatcher):
         return self.extractor.extract(request) == self._value
 
 
+class ContainsMatcher(RequestMatcher):
+    def __init__(self, extractor: RequestExtractor, value):
+        self.extractor = extractor
+        self._value = value
+
+    def match(self, request: Request) -> bool:
+        return self._value in self.extractor.extract(request)
+
+
 class ResponseHandler(Generic[R], ABC):
     @abstractmethod
     def write_response(self, context: SessionContext):
@@ -179,6 +197,9 @@ class Endpoint(metaclass=EndpointMeta):
 
         if isinstance(value, NoneOf):
             return NoneOfMatcher([self._do_create_component(Component, value) for value in value.values])
+
+        if isinstance(value, Contains):
+            return ContainsMatcher(Component(), value.value)
 
         return self._do_create_component(Component, value)
 
