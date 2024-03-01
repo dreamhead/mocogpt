@@ -1,7 +1,7 @@
 import pytest
 from openai import OpenAI, BadRequestError
 
-from mocogpt import gpt_server, any_of, none_of, contains
+from mocogpt import gpt_server, any_of, none_of, contains, startswith
 
 
 class TestMocoGPT:
@@ -103,3 +103,25 @@ class TestMocoGPT:
             )
 
             assert response.choices[0].message.content == "How can I assist you?"
+
+    def test_should_reply_content_for_starts_operator(self, client: OpenAI):
+        server = gpt_server(12306)
+        server.chat.completions.request(prompt=startswith("Hi")).response(content="How can I assist you?")
+
+        with server:
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo-1106",
+                messages=[{"role": "user", "content": "Hi"}],
+                temperature=1.0
+            )
+
+            assert response.choices[0].message.content == "How can I assist you?"
+
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo-1106",
+                messages=[{"role": "user", "content": "Hi, how are you?"}],
+                temperature=1.0
+            )
+
+            assert response.choices[0].message.content == "How can I assist you?"
+

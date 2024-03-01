@@ -4,31 +4,38 @@ from inspect import Parameter, Signature
 from typing import Generic, TypeVar
 
 
-class AnyOf:
-    def __init__(self, *args):
-        self._args = args
-
-    @property
-    def values(self):
-        return self._args
-
-
-class NoneOf:
-    def __init__(self, *args):
-        self.args = args
-
-    @property
-    def values(self):
-        return self.args
-
-
-class Contains:
+class UnaryOperator:
     def __init__(self, arg):
         self._arg = arg
 
     @property
-    def value(self):
+    def arg(self):
         return self._arg
+
+
+class VarargOperator:
+    def __init__(self, *args):
+        self._args = args
+
+    @property
+    def args(self):
+        return self._args
+
+
+class AnyOf(VarargOperator):
+    pass
+
+
+class NoneOf(VarargOperator):
+    pass
+
+
+class Contains(UnaryOperator):
+    pass
+
+
+class Startswith(UnaryOperator):
+    pass
 
 
 class RequestMeta(type):
@@ -129,6 +136,15 @@ class ContainsMatcher(RequestMatcher):
         return self._value in self.extractor.extract(request)
 
 
+class StartswithMatcher(RequestMatcher):
+    def __init__(self, extractor: RequestExtractor, value):
+        self.extractor = extractor
+        self._value = value
+
+    def match(self, request: Request) -> bool:
+        return self.extractor.extract(request).startswith(self._value)
+
+
 class ResponseHandler(Generic[R], ABC):
     @abstractmethod
     def write_response(self, context: SessionContext):
@@ -193,13 +209,16 @@ class Endpoint(metaclass=EndpointMeta):
 
     def _create_component(self, Component: type, value):
         if isinstance(value, AnyOf):
-            return AnyOfMatcher([self._do_create_component(Component, value) for value in value.values])
+            return AnyOfMatcher([self._do_create_component(Component, value) for value in value.args])
 
         if isinstance(value, NoneOf):
-            return NoneOfMatcher([self._do_create_component(Component, value) for value in value.values])
+            return NoneOfMatcher([self._do_create_component(Component, value) for value in value.args])
 
         if isinstance(value, Contains):
-            return ContainsMatcher(Component(), value.value)
+            return ContainsMatcher(Component(), value.arg)
+
+        if isinstance(value, Startswith):
+            return StartswithMatcher(Component(), value.arg)
 
         return self._do_create_component(Component, value)
 
