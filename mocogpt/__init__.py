@@ -1,6 +1,6 @@
 from .core.actual_server import ActualGptServer
 from .core.base_server import GptServer
-from .core.base_typing import AnyOf, NoneOf, Contains, Startswith
+from .core.base_typing import AnyOf, NoneOf, Contains, Startswith, Endswith
 
 __all__ = [
     'any_of',
@@ -23,6 +23,10 @@ def contains(arg):
 
 def startswith(arg):
     return Startswith(arg)
+
+
+def endswith(arg):
+    return Endswith(arg)
 
 
 def gpt_server(port) -> GptServer:

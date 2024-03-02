@@ -38,6 +38,10 @@ class Startswith(UnaryOperator):
     pass
 
 
+class Endswith(UnaryOperator):
+    pass
+
+
 class RequestMeta(type):
     def __new__(cls, clsname, bases, clsdict):
         _content_fields: list[str] = clsdict.get('_content_fields', [])
@@ -114,7 +118,7 @@ class NoneOfMatcher(RequestMatcher):
 
 class RequestExtractor(Generic[T], ABC):
     @abstractmethod
-    def extract(self, request: T):
+    def extract(self, request: T) -> str:
         pass
 
 
@@ -143,6 +147,15 @@ class StartswithMatcher(RequestMatcher):
 
     def match(self, request: Request) -> bool:
         return self.extractor.extract(request).startswith(self._value)
+
+
+class EndswithMatcher(RequestMatcher):
+    def __init__(self, extractor: RequestExtractor, value):
+        self.extractor = extractor
+        self._value = value
+
+    def match(self, request: Request) -> bool:
+        return self.extractor.extract(request).endswith(self._value)
 
 
 class ResponseHandler(Generic[R], ABC):
@@ -219,6 +232,9 @@ class Endpoint(metaclass=EndpointMeta):
 
         if isinstance(value, Startswith):
             return StartswithMatcher(Component(), value.arg)
+
+        if isinstance(value, Endswith):
+            return EndswithMatcher(Component(), value.arg)
 
         return self._do_create_component(Component, value)
 
