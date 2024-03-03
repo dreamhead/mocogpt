@@ -1,3 +1,4 @@
+import re
 from abc import ABC, abstractmethod
 from functools import partial
 from inspect import Parameter, Signature
@@ -39,6 +40,10 @@ class Startswith(UnaryOperator):
 
 
 class Endswith(UnaryOperator):
+    pass
+
+
+class Regex(UnaryOperator):
     pass
 
 
@@ -158,6 +163,15 @@ class EndswithMatcher(RequestMatcher):
         return self.extractor.extract(request).endswith(self._value)
 
 
+class RegexMatcher(RequestMatcher):
+    def __init__(self, extractor: RequestExtractor, value):
+        self.extractor = extractor
+        self._value = value
+
+    def match(self, request: Request) -> bool:
+        return re.match(self._value, self.extractor.extract(request))
+
+
 class ResponseHandler(Generic[R], ABC):
     @abstractmethod
     def write_response(self, context: SessionContext):
@@ -235,6 +249,9 @@ class Endpoint(metaclass=EndpointMeta):
 
         if isinstance(value, Endswith):
             return EndswithMatcher(Component(), value.arg)
+
+        if isinstance(value, Regex):
+            return RegexMatcher(Component(), value.arg)
 
         return self._do_create_component(Component, value)
 
