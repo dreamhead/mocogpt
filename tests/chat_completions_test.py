@@ -1,7 +1,6 @@
-import pytest
-from openai import BadRequestError, OpenAI
+from openai import OpenAI
 
-from mocogpt import any_of, gpt_server, none_of
+from mocogpt import gpt_server
 
 
 class TestChatCompletions:

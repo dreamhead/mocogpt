@@ -1,7 +1,7 @@
 import pytest
-from openai import OpenAI, BadRequestError
+from openai import BadRequestError, OpenAI
 
-from mocogpt import gpt_server, any_of, none_of, contains, startswith, endswith, regex
+from mocogpt import any_of, contains, endswith, eq, gpt_server, none_of, regex, startswith
 
 
 class TestMocoGPT:
@@ -82,6 +82,19 @@ class TestMocoGPT:
                     model="gpt-4",
                     messages=[{"role": "user", "content": "Hi"}]
                 )
+
+    def test_should_reply_content_for_eq_operator(self, client: OpenAI):
+        server = gpt_server(12306)
+        server.chat.completions.request(prompt=eq("Hi")).response(content="How can I assist you?")
+
+        with server:
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo-1106",
+                messages=[{"role": "user", "content": "Hi"}],
+                temperature=1.0
+            )
+
+            assert response.choices[0].message.content == "How can I assist you?"
 
     def test_should_reply_content_for_contains_operator(self, client: OpenAI):
         server = gpt_server(12306)
@@ -167,3 +180,25 @@ class TestMocoGPT:
 
             assert response.choices[0].message.content == "How can I assist you?"
 
+    def test_should_reply_content_for_specified_any_prompt_with_operator(self, client: OpenAI):
+        server = gpt_server(12306)
+        server.chat.completions.request(
+            prompt=any_of(startswith("Hi"), startswith("Hello"))
+        ).response(
+            content="How can I assist you?"
+        )
+
+        with server:
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": "Hi"}]
+            )
+
+            assert response.choices[0].message.content == "How can I assist you?"
+
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": "Hello"}]
+            )
+
+            assert response.choices[0].message.content == "How can I assist you?"

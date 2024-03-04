@@ -1,50 +1,75 @@
 import re
 from abc import ABC, abstractmethod
+from enum import Enum, unique
 from functools import partial
 from inspect import Parameter, Signature
 from typing import Generic, TypeVar
 
 
-class UnaryOperator:
-    def __init__(self, arg):
-        self._arg = arg
+@unique
+class UnaryOperatorType(Enum):
+    EQUALS = 0
+    CONTAINS = 1
+    STARTSWITH = 2
+    ENDSWITH = 3
+    REGEX = 4
 
-    @property
-    def arg(self):
-        return self._arg
+
+class UnaryOperator:
+    operators = {
+        UnaryOperatorType.EQUALS: lambda value, arg: value == arg,
+        UnaryOperatorType.CONTAINS: lambda value, arg: arg in value,
+        UnaryOperatorType.STARTSWITH: lambda value, arg: value.startswith(arg),
+        UnaryOperatorType.ENDSWITH: lambda value, arg: value.endswith(arg),
+        UnaryOperatorType.REGEX: lambda value, arg: re.match(arg, value) is not None
+    }
+
+    def __init__(self, _type: UnaryOperatorType, arg):
+        self.type = _type
+        self.arg = arg
+
+    def match(self, value):
+        return UnaryOperator.operators[self.type](value, self.arg)
+
+
+@unique
+class VarargOperatorType(Enum):
+    ANY_OF = 1
+    NONE_OF = 2
 
 
 class VarargOperator:
-    def __init__(self, *args):
-        self._args = args
-
-    @property
-    def args(self):
-        return self._args
+    def __init__(self, type: VarargOperatorType, *args):
+        self.type = type
+        self.args = args
 
 
-class AnyOf(VarargOperator):
-    pass
+def any_of(*args):
+    return VarargOperator(VarargOperatorType.ANY_OF, *args)
 
 
-class NoneOf(VarargOperator):
-    pass
+def none_of(*args):
+    return VarargOperator(VarargOperatorType.NONE_OF, *args)
 
 
-class Contains(UnaryOperator):
-    pass
+def eq(arg):
+    return UnaryOperator(UnaryOperatorType.EQUALS, arg)
 
 
-class Startswith(UnaryOperator):
-    pass
+def contains(arg):
+    return UnaryOperator(UnaryOperatorType.CONTAINS, arg)
 
 
-class Endswith(UnaryOperator):
-    pass
+def startswith(arg):
+    return UnaryOperator(UnaryOperatorType.STARTSWITH, arg)
 
 
-class Regex(UnaryOperator):
-    pass
+def endswith(arg):
+    return UnaryOperator(UnaryOperatorType.ENDSWITH, arg)
+
+
+def regex(arg):
+    return UnaryOperator(UnaryOperatorType.REGEX, arg)
 
 
 class RequestMeta(type):
@@ -127,49 +152,13 @@ class RequestExtractor(Generic[T], ABC):
         pass
 
 
-class EqualsMatcher(RequestMatcher):
-    def __init__(self, extractor: RequestExtractor, value):
+class UnaryOperatorMatcher(RequestMatcher):
+    def __init__(self, extractor: RequestExtractor, operator: UnaryOperator):
         self.extractor = extractor
-        self._value = value
+        self.operator = operator
 
     def match(self, request: Request) -> bool:
-        return self.extractor.extract(request) == self._value
-
-
-class ContainsMatcher(RequestMatcher):
-    def __init__(self, extractor: RequestExtractor, value):
-        self.extractor = extractor
-        self._value = value
-
-    def match(self, request: Request) -> bool:
-        return self._value in self.extractor.extract(request)
-
-
-class StartswithMatcher(RequestMatcher):
-    def __init__(self, extractor: RequestExtractor, value):
-        self.extractor = extractor
-        self._value = value
-
-    def match(self, request: Request) -> bool:
-        return self.extractor.extract(request).startswith(self._value)
-
-
-class EndswithMatcher(RequestMatcher):
-    def __init__(self, extractor: RequestExtractor, value):
-        self.extractor = extractor
-        self._value = value
-
-    def match(self, request: Request) -> bool:
-        return self.extractor.extract(request).endswith(self._value)
-
-
-class RegexMatcher(RequestMatcher):
-    def __init__(self, extractor: RequestExtractor, value):
-        self.extractor = extractor
-        self._value = value
-
-    def match(self, request: Request) -> bool:
-        return re.match(self._value, self.extractor.extract(request))
+        return self.operator.match(self.extractor.extract(request))
 
 
 class ResponseHandler(Generic[R], ABC):
@@ -235,29 +224,23 @@ class Endpoint(metaclass=EndpointMeta):
         return session
 
     def _create_component(self, Component: type, value):
-        if isinstance(value, AnyOf):
-            return AnyOfMatcher([self._do_create_component(Component, value) for value in value.args])
+        if isinstance(value, VarargOperator):
+            if value.type == VarargOperatorType.ANY_OF:
+                return AnyOfMatcher([self._create_component(Component, value) for value in value.args])
 
-        if isinstance(value, NoneOf):
-            return NoneOfMatcher([self._do_create_component(Component, value) for value in value.args])
+            if value.type == VarargOperatorType.NONE_OF:
+                return NoneOfMatcher([self._create_component(Component, value) for value in value.args])
 
-        if isinstance(value, Contains):
-            return ContainsMatcher(Component(), value.arg)
+            raise ValueError(f'Unknown operator type: {value.type}')
 
-        if isinstance(value, Startswith):
-            return StartswithMatcher(Component(), value.arg)
-
-        if isinstance(value, Endswith):
-            return EndswithMatcher(Component(), value.arg)
-
-        if isinstance(value, Regex):
-            return RegexMatcher(Component(), value.arg)
+        if isinstance(value, UnaryOperator):
+            return UnaryOperatorMatcher(Component(), value)
 
         return self._do_create_component(Component, value)
 
     def _do_create_component(self, Component, value):
         if issubclass(Component, RequestExtractor):
-            return EqualsMatcher(Component(), value)
+            return UnaryOperatorMatcher(Component(), eq(value))
 
         return Component(value)
 
