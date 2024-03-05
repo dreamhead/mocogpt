@@ -25,6 +25,9 @@ class UnaryOperator:
     }
 
     def __init__(self, _type: UnaryOperatorType, arg):
+        if _type not in UnaryOperator.operators:
+            raise f"Unknown operator {_type}"
+
         self.type = _type
         self.arg = arg
 
@@ -34,14 +37,24 @@ class UnaryOperator:
 
 @unique
 class VarargOperatorType(Enum):
+    ALL_OF = 0
     ANY_OF = 1
     NONE_OF = 2
 
 
 class VarargOperator:
+    operators = {
+        VarargOperatorType.ALL_OF: lambda value, matchers: all(matcher.match(value) for matcher in matchers),
+        VarargOperatorType.ANY_OF: lambda value, matchers: any(matcher.match(value) for matcher in matchers),
+        VarargOperatorType.NONE_OF: lambda value, matchers: not any(matcher.match(value) for matcher in matchers),
+    }
+
     def __init__(self, type: VarargOperatorType, *args):
         self.type = type
         self.args = args
+
+    def match(self, matchers, value):
+        return VarargOperator.operators[self.type](value, matchers)
 
 
 def any_of(*args):
@@ -130,22 +143,6 @@ class AllOfMatcher(RequestMatcher):
         return all(matcher.match(request) for matcher in self.matchers)
 
 
-class AnyOfMatcher(RequestMatcher):
-    def __init__(self, matchers: list[RequestMatcher]):
-        self.matchers = matchers
-
-    def match(self, request: Request) -> bool:
-        return any(matcher.match(request) for matcher in self.matchers)
-
-
-class NoneOfMatcher(RequestMatcher):
-    def __init__(self, matchers: list[RequestMatcher]):
-        self.matchers = matchers
-
-    def match(self, request: Request) -> bool:
-        return not any(matcher.match(request) for matcher in self.matchers)
-
-
 class RequestExtractor(Generic[T], ABC):
     @abstractmethod
     def extract(self, request: T) -> str:
@@ -159,6 +156,15 @@ class UnaryOperatorMatcher(RequestMatcher):
 
     def match(self, request: Request) -> bool:
         return self.operator.match(self.extractor.extract(request))
+
+
+class VarargOperatorMatcher(RequestMatcher):
+    def __init__(self, matchers: list[RequestMatcher], operator: VarargOperator):
+        self.matchers = matchers
+        self.operator = operator
+
+    def match(self, request: Request) -> bool:
+        return self.operator.match(self.matchers, request)
 
 
 class ResponseHandler(Generic[R], ABC):
@@ -192,7 +198,9 @@ class SessionSetting:
         self._create_matcher = create_matcher
 
     def or_request(self, **kwargs):
-        self._matcher = AnyOfMatcher([self._matcher, self._create_matcher(**kwargs)])
+        self._matcher = VarargOperatorMatcher(
+            [self._matcher, self._create_matcher(**kwargs)],
+            VarargOperator(VarargOperatorType.ANY_OF))
         return self
 
     def response(self, **kwargs):
@@ -223,26 +231,21 @@ class Endpoint(metaclass=EndpointMeta):
         self.sessions.append(session)
         return session
 
-    def _create_component(self, Component: type, value):
+    def _create_component(self, component_type: type, value):
         if isinstance(value, VarargOperator):
-            if value.type == VarargOperatorType.ANY_OF:
-                return AnyOfMatcher([self._create_component(Component, value) for value in value.args])
-
-            if value.type == VarargOperatorType.NONE_OF:
-                return NoneOfMatcher([self._create_component(Component, value) for value in value.args])
-
-            raise ValueError(f'Unknown operator type: {value.type}')
+            components = [self._create_component(component_type, value) for value in value.args]
+            return VarargOperatorMatcher(components, value)
 
         if isinstance(value, UnaryOperator):
-            return UnaryOperatorMatcher(Component(), value)
+            return UnaryOperatorMatcher(component_type(), value)
 
-        return self._do_create_component(Component, value)
+        return self._do_create_component(component_type, value)
 
-    def _do_create_component(self, Component, value):
-        if issubclass(Component, RequestExtractor):
-            return UnaryOperatorMatcher(Component(), eq(value))
+    def _do_create_component(self, component_type: type, value):
+        if issubclass(component_type, RequestExtractor):
+            return UnaryOperatorMatcher(component_type(), eq(value))
 
-        return Component(value)
+        return component_type(value)
 
     def _create_components(self, sig: Signature, component_classes: dict, **kwargs):
         sig.bind(**kwargs)
