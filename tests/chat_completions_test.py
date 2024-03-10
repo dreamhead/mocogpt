@@ -128,7 +128,18 @@ class TestChatCompletions:
 
             assert response.choices[0].message.content == "How can I assist you?"
 
+    def test_should_reply_content_for_specified_frequency_penalty(self, client: OpenAI):
+        server = gpt_server(12306)
+        server.chat.completions.request(frequency_penalty=1.0).response(content="How can I assist you?")
 
+        with server:
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo-1106",
+                messages=[{"role": "user", "content": "Hi"}],
+                frequency_penalty=1.0
+            )
+
+            assert response.choices[0].message.content == "How can I assist you?"
 
     def test_should_reply_content_for_specified_api_key(self, client: OpenAI):
         server = gpt_server(12306)
