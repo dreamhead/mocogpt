@@ -12,7 +12,7 @@ def count_tokens(model: str, content: str) -> int:
 
 
 class CompletionsRequest(Request):
-    _content_fields = ['temperature', 'max_tokens', 'user', 'n', 'seed', 'stop', 'frequency_penalty']
+    _content_fields = ['temperature', 'max_tokens', 'user', 'n', 'seed', 'stop', 'frequency_penalty', 'presence_penalty']
 
     @property
     def prompt(self) -> str:
@@ -135,7 +135,8 @@ class Completions(Endpoint):
         'stop': extractor_class('stop'),
         'n': extractor_class('n'),
         'seed': extractor_class('seed'),
-        'frequency_penalty': extractor_class('frequency_penalty')
+        'frequency_penalty': extractor_class('frequency_penalty'),
+        'presence_penalty': extractor_class('presence_penalty')
     }
     _response_params = {
         'content': ContentResponseHandler
