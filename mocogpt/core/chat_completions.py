@@ -1,5 +1,4 @@
-import random
-import string
+import hashlib
 import time
 
 import tiktoken
@@ -30,11 +29,8 @@ class CompletionsRequest(Request):
         return False
 
 
-def generate_unique_id(length=30):
-    timestamp = str(int(time.time() * 1000))
-    random_part = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length - len(timestamp)))
-    unique_id = timestamp + random_part
-    return unique_id
+def generate_unique_id():
+    return hashlib.md5(str(time.time()).encode()).hexdigest()
 
 
 def split_content(model, content):
