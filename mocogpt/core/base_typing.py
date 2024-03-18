@@ -210,19 +210,19 @@ class SessionSetting:
 class EndpointMeta(type):
     def __new__(cls, clsname, bases, clsdict):
         request_params: dict = clsdict.get('_request_params', {})
-        clsdict['__request_sig__'] = make_sig(*request_params.keys())
+        clsdict['__request_sig__'] = make_sig(*request_params)
         response_params: dict = clsdict.get('_response_params', [])
         clsdict['__response_sig__'] = make_sig(*response_params.keys())
         return super().__new__(cls, clsname, bases, clsdict)
 
 
 class Endpoint(metaclass=EndpointMeta):
-    _request_params = {}
+    _request_params = []
     _response_params = {}
 
     def __init__(self):
         self.sessions = []
-        self._create_matchers = partial(self._create_components, self.__request_sig__, self._request_params)
+        self._create_matchers = partial(self._actual_create_matchers)
         self._create_handlers = partial(self._create_components, self.__response_sig__, self._response_params)
 
     def request(self, **kwargs) -> SessionSetting:
@@ -230,6 +230,32 @@ class Endpoint(metaclass=EndpointMeta):
         session = SessionSetting(matcher, self._create_matchers, self._create_handlers)
         self.sessions.append(session)
         return session
+
+    def _actual_create_matchers(self, **kwargs):
+        self.__request_sig__.bind(**kwargs)
+        components = [self._do_create_matchers(param, value)
+                      for param in self._request_params if (value := kwargs.get(param))]
+
+        if len(components) == 0:
+            raise ValueError('No components specified')
+
+        if len(components) == 1:
+            return components[0]
+
+        return AllOfMatcher(components)
+
+    def _do_create_matchers(self, value, arg):
+        if isinstance(arg, VarargOperator):
+            components = [self._do_create_matchers(value, item) for item in arg.args]
+            return VarargOperatorMatcher(components, arg)
+
+        if isinstance(arg, UnaryOperator):
+            return UnaryOperatorMatcher(extractor_class(value)(), arg)
+
+        return self._do_create_matcher(value, arg)
+
+    def _do_create_matcher(self, value, arg):
+        return UnaryOperatorMatcher(extractor_class(value)(), eq(arg))
 
     def _create_component(self, component_type: type, value):
         if isinstance(value, VarargOperator):

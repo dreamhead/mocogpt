@@ -122,22 +122,23 @@ class ContentResponseHandler(ResponseHandler[CompletionsResponse]):
 
 
 class Completions(Endpoint):
-    _request_params = {
-        'api_key': extractor_class('api_key'),
-        'model': extractor_class('model'),
-        'prompt': extractor_class('prompt'),
-        'temperature': extractor_class('temperature'),
-        'max_tokens': extractor_class('max_tokens'),
-        'user': extractor_class('user'),
-        'stop': extractor_class('stop'),
-        'n': extractor_class('n'),
-        'seed': extractor_class('seed'),
-        'frequency_penalty': extractor_class('frequency_penalty'),
-        'presence_penalty': extractor_class('presence_penalty'),
-        'logprobs': extractor_class('logprobs'),
-        'top_logprobs': extractor_class('top_logprobs'),
-        'top_p': extractor_class('top_p')
-    }
+    _request_params = [
+        'api_key',
+        'model',
+        'prompt',
+        'temperature',
+        'max_tokens',
+        'user',
+        'stop',
+        'n',
+        'seed',
+        'frequency_penalty',
+        'presence_penalty',
+        'logprobs',
+        'top_logprobs',
+        'top_p'
+    ]
+
     _response_params = {
         'content': ContentResponseHandler
     }

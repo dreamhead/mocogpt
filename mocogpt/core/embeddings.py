@@ -42,12 +42,12 @@ class EmbeddingsResponseHandler(ResponseHandler[EmbeddingsResponse]):
 
 class Embeddings(Endpoint):
     _request_params = {
-        'api_key': extractor_class('api_key'),
-        'model': extractor_class('model'),
-        'input': extractor_class('input'),
-        'encoding_format': extractor_class('encoding_format'),
-        'dimensions': extractor_class('dimensions'),
-        'user': extractor_class('user')
+        'api_key',
+        'model',
+        'input',
+        'encoding_format',
+        'dimensions',
+        'user'
     }
     _response_params = {
         'embeddings': EmbeddingsResponseHandler
