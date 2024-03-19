@@ -1,4 +1,4 @@
-from mocogpt.core.base_typing import Endpoint, Request, Response, ResponseHandler, SessionContext, extractor_class
+from mocogpt.core.base_typing import Endpoint, Request, Response, ResponseHandler, SessionContext
 
 
 class EmbeddingsRequest(Request):
