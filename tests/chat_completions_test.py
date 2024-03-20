@@ -1,3 +1,5 @@
+import time
+
 from openai import OpenAI
 
 from mocogpt import gpt_server
@@ -193,8 +195,6 @@ class TestChatCompletions:
 
             assert response.choices[0].message.content == "How can I assist you?"
 
-
-
     def test_should_reply_content_for_specified_api_key(self, client: OpenAI):
         server = gpt_server(12306)
         server.chat.completions.request(api_key="sk-123456789", prompt="Hi").response(content="Hi")
@@ -216,3 +216,18 @@ class TestChatCompletions:
             )
 
             assert response.choices[0].message.content == "Hello"
+
+    def test_should_reply_content_for_specified_delay(self, client: OpenAI):
+        server = gpt_server(12306)
+        server.chat.completions.request(prompt="Hi").response(content="How can I assist you?", sleep=1)
+
+        with server:
+            start = time.time()
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": "Hi"}]
+            )
+            stop = time.time()
+
+            assert response.choices[0].message.content == "How can I assist you?"
+            assert stop - start > 1

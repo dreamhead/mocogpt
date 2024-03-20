@@ -38,10 +38,14 @@ class ChatCompletionsBinder:
         return matcher
 
     def create_handler(self, response) -> dict:
+        handler = {}
         if "content" in response:
-            return {"content": response['content']}
+            handler["content"] = response['content']
 
-        return {}
+        if "sleep" in response:
+            handler["sleep"] = response['sleep']
+
+        return handler
 
 
 class EmbeddingsBinder:
@@ -82,10 +86,14 @@ class EmbeddingsBinder:
         return matcher
 
     def create_handler(self, response):
+        handler = {}
         if "embeddings" in response:
-            return {"embeddings": response['embeddings']}
+            handler["embeddings"] = response["embeddings"]
 
-        return {}
+        if "sleep" in response:
+            handler["sleep"] = response['sleep']
+
+        return handler
 
 
 class ConfigParser:

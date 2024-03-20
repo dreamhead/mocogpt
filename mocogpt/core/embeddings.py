@@ -1,4 +1,4 @@
-from mocogpt.core.base_typing import Endpoint, Request, Response, ResponseHandler, SessionContext
+from mocogpt.core.base_typing import Endpoint, Request, Response, ResponseHandler, SessionContext, SleepResponseHandler
 
 
 class EmbeddingsRequest(Request):
@@ -50,5 +50,6 @@ class Embeddings(Endpoint):
         'user'
     }
     _response_params = {
-        'embeddings': EmbeddingsResponseHandler
+        'embeddings': EmbeddingsResponseHandler,
+        'sleep': SleepResponseHandler
     }

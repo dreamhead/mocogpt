@@ -3,7 +3,7 @@ import time
 
 import tiktoken
 
-from mocogpt.core.base_typing import Endpoint, Request, Response, ResponseHandler, SessionContext
+from mocogpt.core.base_typing import Endpoint, Request, Response, ResponseHandler, SessionContext, SleepResponseHandler
 
 
 def count_tokens(model: str, content: str) -> int:
@@ -140,7 +140,8 @@ class Completions(Endpoint):
     ]
 
     _response_params = {
-        'content': ContentResponseHandler
+        'content': ContentResponseHandler,
+        'sleep': SleepResponseHandler
     }
 
 

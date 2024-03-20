@@ -1,4 +1,5 @@
 import re
+import time
 from abc import ABC, abstractmethod
 from enum import Enum, unique
 from functools import partial
@@ -171,6 +172,14 @@ class ResponseHandler(Generic[R], ABC):
     @abstractmethod
     def write_response(self, context: SessionContext):
         pass
+
+
+class SleepResponseHandler(ResponseHandler):
+    def __init__(self, seconds):
+        self.seconds = seconds
+
+    def write_response(self, context: SessionContext):
+        time.sleep(self.seconds)
 
 
 class AllOfHandler(ResponseHandler):

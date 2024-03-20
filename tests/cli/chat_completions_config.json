@@ -16,6 +16,15 @@
       "response": {
         "content": "How can I assist you?"
       }
+    },
+    {
+      "request": {
+        "prompt": "sleep"
+      },
+      "response": {
+        "content": "How can I assist you?",
+        "sleep": 1
+      }
     }
   ]
 }
