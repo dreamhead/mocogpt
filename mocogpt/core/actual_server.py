@@ -114,6 +114,9 @@ class ActualGptServer(GptServer):
             return await self.default_response(request)
 
         matched_session.write_response(context)
+        if not context.response.is_success():
+            return await self.error_response(request, context)
+
         if chat_request.stream:
             return await self.stream_response(context, request)
 
@@ -153,5 +156,21 @@ class ActualGptServer(GptServer):
 
     async def default_response(self, request):
         response = web.Response(status=400, text="Bad Request")
+        await response.prepare(request)
+        return response
+
+    async def error_response(self, request, context: SessionContext):
+        status = context.response.status
+        result = json.dumps(
+            {
+                'error':
+                    {
+                        'message': context.response.api_error.message,
+                        'type': context.response.api_error.type
+
+                    }
+            }
+        )
+        response = web.Response(status=status, text=result)
         await response.prepare(request)
         return response

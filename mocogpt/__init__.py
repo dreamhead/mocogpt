@@ -1,6 +1,6 @@
 from .core.actual_server import ActualGptServer
 from .core.base_server import GptServer
-from .core.base_typing import any_of, contains, endswith, eq, none_of, regex, startswith
+from .core.base_typing import any_of, contains, endswith, eq, none_of, regex, startswith, rate_limit
 
 __all__ = [
     'eq',
@@ -10,7 +10,8 @@ __all__ = [
     'startswith',
     'endswith',
     'regex',
-    'gpt_server'
+    'gpt_server',
+    'rate_limit'
 ]
 
 

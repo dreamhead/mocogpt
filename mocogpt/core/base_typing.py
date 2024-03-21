@@ -110,10 +110,41 @@ class Request(metaclass=RequestMeta):
         return self._content['model']
 
 
+class APIError:
+    def __init__(self, status, message, _type):
+        self.status = status
+        self.message = message
+        self.type = _type
+
+
+def rate_limit(message, type):
+    return APIError(429, message, type)
+
+
 class Response(ABC):
     def __init__(self, model):
         self._model = model
         self._content = []
+        self._status = 200
+        self._api_error = None
+
+    def is_success(self):
+        return self._status == 200
+
+
+    @property
+    def status(self):
+        return self._status
+
+
+    @property
+    def api_error(self) -> APIError:
+        return self._api_error
+
+    @api_error.setter
+    def api_error(self, api_error: APIError):
+        self._api_error = api_error
+        self._status = api_error.status
 
 
 T = TypeVar('T', bound=Request)
@@ -126,7 +157,7 @@ class SessionContext(Generic[T, R]):
         self._response = response
 
     @property
-    def response(self):
+    def response(self) -> R:
         return self._response
 
 
@@ -189,6 +220,14 @@ class AllOfHandler(ResponseHandler):
     def write_response(self, context: SessionContext):
         for handler in self.handlers:
             handler.write_response(context)
+
+
+class APIErrorHandler(ResponseHandler):
+    def __init__(self, api_error: APIError):
+        self.api_error = api_error
+
+    def write_response(self, context: SessionContext):
+        context.response.api_error = self.api_error
 
 
 def make_sig(*names) -> Signature:
