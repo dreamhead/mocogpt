@@ -2,7 +2,7 @@ import openai
 import pytest
 from openai import OpenAI
 
-from mocogpt import gpt_server, rate_limit
+from mocogpt import gpt_server, rate_limit, authentication_error
 
 
 class TestMocoGPT:
@@ -17,3 +17,13 @@ class TestMocoGPT:
                     messages=[{"role": "user", "content": "Hi"}]
                 )
 
+    def test_should_raise_authentication_error(self, client: OpenAI):
+        server = gpt_server(12306)
+        server.chat.completions.request(prompt="Hi").response(error=authentication_error("Authentication Error", 'new_api_error'))
+
+        with server:
+            with pytest.raises(openai.AuthenticationError):
+                client.chat.completions.create(
+                    model="gpt-4",
+                    messages=[{"role": "user", "content": "Hi"}]
+                )

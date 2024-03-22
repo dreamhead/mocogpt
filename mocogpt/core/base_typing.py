@@ -121,6 +121,10 @@ def rate_limit(message, type):
     return APIError(429, message, type)
 
 
+def authentication_error(message, type):
+    return APIError(401, message, type)
+
+
 class Response(ABC):
     def __init__(self, model):
         self._model = model
@@ -131,11 +135,9 @@ class Response(ABC):
     def is_success(self):
         return self._status == 200
 
-
     @property
     def status(self):
         return self._status
-
 
     @property
     def api_error(self) -> APIError:
