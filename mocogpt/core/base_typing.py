@@ -125,6 +125,10 @@ def authentication_error(message, type):
     return APIError(401, message, type)
 
 
+def permission_denied_error(message, type):
+    return APIError(403, message, type)
+
+
 class Response(ABC):
     def __init__(self, model):
         self._model = model

@@ -1,7 +1,7 @@
 from .core.actual_server import ActualGptServer
 from .core.base_server import GptServer
 from .core.base_typing import any_of, contains, endswith, eq, none_of, regex, startswith, rate_limit, \
-    authentication_error
+    authentication_error, permission_denied_error
 
 __all__ = [
     'eq',
@@ -13,7 +13,8 @@ __all__ = [
     'regex',
     'gpt_server',
     'rate_limit',
-    'authentication_error'
+    'authentication_error',
+    'permission_denied_error'
 ]
 
 
