@@ -2,7 +2,7 @@ import openai
 import pytest
 from openai import OpenAI
 
-from mocogpt import gpt_server, rate_limit, authentication_error, permission_denied, not_found
+from mocogpt import gpt_server, rate_limit, authentication_error, permission_denied, not_found, bad_request
 
 
 class TestMocoGPT:
@@ -19,7 +19,8 @@ class TestMocoGPT:
 
     def test_should_raise_authentication_error(self, client: OpenAI):
         server = gpt_server(12306)
-        server.chat.completions.request(prompt="Hi").response(error=authentication_error("Authentication Error", 'new_api_error'))
+        server.chat.completions.request(prompt="Hi").response(
+            error=authentication_error("Authentication Error", 'new_api_error'))
 
         with server:
             with pytest.raises(openai.AuthenticationError):
@@ -30,7 +31,8 @@ class TestMocoGPT:
 
     def test_should_raise_permission_denied_error(self, client: OpenAI):
         server = gpt_server(12306)
-        server.chat.completions.request(prompt="Hi").response(error=permission_denied("Permission Denied", 'new_api_error'))
+        server.chat.completions.request(prompt="Hi").response(
+            error=permission_denied("Permission Denied", 'new_api_error'))
 
         with server:
             with pytest.raises(openai.PermissionDeniedError):
@@ -50,5 +52,13 @@ class TestMocoGPT:
                     messages=[{"role": "user", "content": "Hi"}]
                 )
 
+    def test_should_bad_request_error(self, client: OpenAI):
+        server = gpt_server(12306)
+        server.chat.completions.request(prompt="Hi").response(error=bad_request("Bad Request", 'new_api_error'))
 
-
+        with server:
+            with pytest.raises(openai.BadRequestError):
+                client.chat.completions.create(
+                    model="gpt-4",
+                    messages=[{"role": "user", "content": "Hi"}]
+                )

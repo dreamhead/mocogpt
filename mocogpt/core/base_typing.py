@@ -133,6 +133,10 @@ def not_found(message, type):
     return APIError(404, message, type)
 
 
+def bad_request(message, type):
+    return APIError(400, message, type)
+
+
 class Response(ABC):
     def __init__(self, model):
         self._model = model
