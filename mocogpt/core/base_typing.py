@@ -117,8 +117,8 @@ class APIError:
         self.type = _type
 
 
-def rate_limit(message, type):
-    return APIError(429, message, type)
+def bad_request(message, type):
+    return APIError(400, message, type)
 
 
 def authentication_error(message, type):
@@ -133,8 +133,12 @@ def not_found(message, type):
     return APIError(404, message, type)
 
 
-def bad_request(message, type):
-    return APIError(400, message, type)
+def conflict_error(message, type):
+    return APIError(409, message, type)
+
+
+def rate_limit(message, type):
+    return APIError(429, message, type)
 
 
 class Response(ABC):
