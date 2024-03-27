@@ -53,7 +53,7 @@ class TestMocoGPT:
                     messages=[{"role": "user", "content": "Hi"}]
                 )
 
-    def test_should_bad_request_error(self, client: OpenAI):
+    def test_should_raise_bad_request_error(self, client: OpenAI):
         server = gpt_server(12306)
         server.chat.completions.request(prompt="Hi").response(error=bad_request("Bad Request", 'new_api_error'))
 
@@ -64,7 +64,7 @@ class TestMocoGPT:
                     messages=[{"role": "user", "content": "Hi"}]
                 )
 
-    def test_should_conflict_error(self, client: OpenAI):
+    def test_should_raise_conflict_error(self, client: OpenAI):
         server = gpt_server(12306)
         server.chat.completions.request(prompt="Hi").response(error=conflict_error("Bad Request", 'new_api_error'))
 
