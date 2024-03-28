@@ -25,6 +25,18 @@
         "content": "How can I assist you?",
         "sleep": 1
       }
+    },
+    {
+      "request": {
+        "prompt": "error"
+      },
+      "response": {
+        "error": {
+          "name": "rate_limit",
+          "message": "Rate limit exceeded",
+          "type": "new_api_error"
+        }
+      }
     }
   ]
 }

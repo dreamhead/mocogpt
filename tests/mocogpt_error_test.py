@@ -2,8 +2,15 @@ import openai
 import pytest
 from openai import OpenAI
 
-from mocogpt import gpt_server, rate_limit, authentication_error, permission_denied, not_found, bad_request, \
-    conflict_error
+from mocogpt import (
+    authentication_error,
+    bad_request,
+    conflict_error,
+    gpt_server,
+    not_found,
+    permission_denied,
+    rate_limit,
+)
 
 
 class TestMocoGPT:

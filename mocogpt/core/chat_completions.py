@@ -3,8 +3,15 @@ import time
 
 import tiktoken
 
-from mocogpt.core.base_typing import Endpoint, Request, Response, ResponseHandler, SessionContext, SleepResponseHandler, \
-    APIErrorHandler
+from mocogpt.core.base_typing import (
+    APIErrorHandler,
+    Endpoint,
+    Request,
+    Response,
+    ResponseHandler,
+    SessionContext,
+    SleepResponseHandler,
+)
 
 
 def count_tokens(model: str, content: str) -> int:

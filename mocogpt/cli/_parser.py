@@ -1,5 +1,25 @@
+from mocogpt import authentication_error, bad_request, conflict_error, not_found, permission_denied, rate_limit
+
 from ._args import StartArgs
 from ._server import console_server
+
+
+def create_error(error):
+    name = error['name']
+    type = error['type']
+    message = error['message']
+    if name == 'rate_limit':
+        return rate_limit(message, type)
+    elif name == 'authentication_error':
+        return authentication_error(message, type)
+    elif name == 'permission_denied':
+        return permission_denied(message, type)
+    elif name == 'not_found':
+        return not_found(message, type)
+    elif name == 'bad_request':
+        return bad_request(message, type)
+    elif name == 'conflict_error':
+        return conflict_error(message, type)
 
 
 class ChatCompletionsBinder:
@@ -11,6 +31,7 @@ class ChatCompletionsBinder:
                 matcher = self.create_matcher(setting['request'])
             if 'response' in setting:
                 handler = self.create_handler(setting['response'])
+
             (server.chat.completions
              .request(**matcher)
              .response(**handler))
@@ -44,6 +65,10 @@ class ChatCompletionsBinder:
 
         if "sleep" in response:
             handler["sleep"] = response['sleep']
+
+        if "error" in response:
+            print(response["error"])
+            handler["error"] = create_error(response["error"])
 
         return handler
 
@@ -93,7 +118,11 @@ class EmbeddingsBinder:
         if "sleep" in response:
             handler["sleep"] = response['sleep']
 
+        if "error" in response:
+            handler["error"] = create_error(response["error"])
+
         return handler
+
 
 
 class ConfigParser:
