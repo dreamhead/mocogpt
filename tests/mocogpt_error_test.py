@@ -9,7 +9,7 @@ from mocogpt import (
     gpt_server,
     not_found,
     permission_denied,
-    rate_limit,
+    rate_limit, internal_error,
 )
 
 
@@ -73,10 +73,21 @@ class TestMocoGPT:
 
     def test_should_raise_conflict_error(self, client: OpenAI):
         server = gpt_server(12306)
-        server.chat.completions.request(prompt="Hi").response(error=conflict_error("Bad Request", 'new_api_error'))
+        server.chat.completions.request(prompt="Hi").response(error=conflict_error("Conflict Error", 'new_api_error'))
 
         with server:
             with pytest.raises(openai.ConflictError):
+                client.chat.completions.create(
+                    model="gpt-4",
+                    messages=[{"role": "user", "content": "Hi"}]
+                )
+
+    def test_should_raise_internal_error(self, client: OpenAI):
+        server = gpt_server(12306)
+        server.chat.completions.request(prompt="Hi").response(error=internal_error("Internal Server Error", 'new_api_error'))
+
+        with server:
+            with pytest.raises(openai.InternalServerError):
                 client.chat.completions.create(
                     model="gpt-4",
                     messages=[{"role": "user", "content": "Hi"}]

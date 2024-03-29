@@ -8,6 +8,7 @@ from .core.base_typing import (
     contains,
     endswith,
     eq,
+    internal_error,
     none_of,
     not_found,
     permission_denied,
@@ -30,7 +31,8 @@ __all__ = [
     'permission_denied',
     'not_found',
     'bad_request',
-    'conflict_error'
+    'conflict_error',
+    'internal_error'
 ]
 
 

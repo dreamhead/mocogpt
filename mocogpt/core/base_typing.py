@@ -141,6 +141,10 @@ def rate_limit(message, type):
     return APIError(429, message, type)
 
 
+def internal_error(message, type):
+    return APIError(500, message, type)
+
+
 class Response(ABC):
     def __init__(self, model):
         self._model = model
