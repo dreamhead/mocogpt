@@ -1,4 +1,5 @@
-from mocogpt import authentication_error, bad_request, conflict_error, not_found, permission_denied, rate_limit
+from mocogpt import authentication_error, bad_request, conflict_error, not_found, permission_denied, rate_limit, \
+    internal_error
 
 from ._args import StartArgs
 from ._server import console_server
@@ -20,6 +21,8 @@ def create_error(error):
         return bad_request(message, type)
     elif name == 'conflict_error':
         return conflict_error(message, type)
+    elif name == 'internal_error':
+        return internal_error(message, type)
 
 
 class ChatCompletionsBinder:
