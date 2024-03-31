@@ -1,0 +1,16 @@
+{
+  "chat.completions": [
+    {
+      "request": {
+        "prompt": "rate limit"
+      },
+      "response": {
+        "error": {
+          "name": "rate_limit",
+          "message": "Rate limit exceeded",
+          "type": "new_api_error"
+        }
+      }
+    }
+  ]
+}
