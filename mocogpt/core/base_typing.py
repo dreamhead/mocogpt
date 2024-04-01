@@ -137,6 +137,10 @@ def conflict_error(message, type):
     return APIError(409, message, type)
 
 
+def unprocessable_entity(message, type):
+    return APIError(422, message, type)
+
+
 def rate_limit(message, type):
     return APIError(429, message, type)
 

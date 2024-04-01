@@ -15,6 +15,7 @@ from .core.base_typing import (
     rate_limit,
     regex,
     startswith,
+    unprocessable_entity,
 )
 
 __all__ = [
@@ -32,7 +33,8 @@ __all__ = [
     'not_found',
     'bad_request',
     'conflict_error',
-    'internal_error'
+    'internal_error',
+    'unprocessable_entity'
 ]
 
 

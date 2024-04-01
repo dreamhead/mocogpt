@@ -1,5 +1,12 @@
-from mocogpt import authentication_error, bad_request, conflict_error, not_found, permission_denied, rate_limit, \
-    internal_error
+from mocogpt import (
+    authentication_error,
+    bad_request,
+    conflict_error,
+    internal_error,
+    not_found,
+    permission_denied,
+    rate_limit,
+)
 
 from ._args import StartArgs
 from ._server import console_server
