@@ -117,36 +117,21 @@ class APIError:
         self.type = _type
 
 
-def bad_request(message, type):
-    return APIError(400, message, type)
+def create_api_error(code):
+    def api_error(message, error_type):
+        return APIError(code, message, error_type)
+
+    return api_error
 
 
-def authentication_error(message, type):
-    return APIError(401, message, type)
-
-
-def permission_denied(message, type):
-    return APIError(403, message, type)
-
-
-def not_found(message, type):
-    return APIError(404, message, type)
-
-
-def conflict_error(message, type):
-    return APIError(409, message, type)
-
-
-def unprocessable_entity(message, type):
-    return APIError(422, message, type)
-
-
-def rate_limit(message, type):
-    return APIError(429, message, type)
-
-
-def internal_error(message, type):
-    return APIError(500, message, type)
+bad_request = create_api_error(400)
+authentication_error = create_api_error(401)
+permission_denied = create_api_error(403)
+not_found = create_api_error(404)
+conflict_error = create_api_error(409)
+unprocessable_entity = create_api_error(422)
+rate_limit = create_api_error(429)
+internal_error = create_api_error(500)
 
 
 class Response(ABC):
