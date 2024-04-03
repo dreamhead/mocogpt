@@ -11,6 +11,18 @@
           "type": "new_api_error"
         }
       }
+    },
+    {
+      "request": {
+        "prompt": "authentication error"
+      },
+      "response": {
+        "error": {
+          "name": "authentication_error",
+          "message": "Authentication Error",
+          "type": "new_api_error"
+        }
+      }
     }
   ]
 }
