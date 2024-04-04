@@ -1,12 +1,4 @@
-from mocogpt import (
-    authentication_error,
-    bad_request,
-    conflict_error,
-    internal_error,
-    not_found,
-    permission_denied,
-    rate_limit,
-)
+import mocogpt
 
 from ._args import StartArgs
 from ._server import console_server
@@ -16,20 +8,11 @@ def create_error(error):
     name = error['name']
     type = error['type']
     message = error['message']
-    if name == 'rate_limit':
-        return rate_limit(message, type)
-    elif name == 'authentication_error':
-        return authentication_error(message, type)
-    elif name == 'permission_denied':
-        return permission_denied(message, type)
-    elif name == 'not_found':
-        return not_found(message, type)
-    elif name == 'bad_request':
-        return bad_request(message, type)
-    elif name == 'conflict_error':
-        return conflict_error(message, type)
-    elif name == 'internal_error':
-        return internal_error(message, type)
+    api_error = getattr(mocogpt, name)
+    if api_error and callable(api_error):
+        return api_error(message, type)
+
+    raise f"Unknown API Error: {name}"
 
 
 class ChatCompletionsBinder:
