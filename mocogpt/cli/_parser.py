@@ -117,7 +117,6 @@ class EmbeddingsBinder:
         return handler
 
 
-
 class ConfigParser:
     def parse(self, cliargs: StartArgs):
         server = console_server(cliargs.port)

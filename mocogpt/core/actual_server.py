@@ -135,14 +135,17 @@ class ActualGptServer(GptServer):
             matched_session = next(
                 (session for session in self.embeddings.sessions if session.match(embeddings_request)), None)
         except Exception as e:
-            print(e)
             return await self.default_response(request)
 
         if matched_session is None:
             return await self.default_response(request)
 
         matched_session.write_response(context)
+        if not context.response.is_success():
+            return await self.error_response(request, context)
+
         response = web.json_response(context.response.to_embeddings())
+        await self.monitor.on_session_end(response.text)
         return response
 
     async def stream_response(self, context, request):

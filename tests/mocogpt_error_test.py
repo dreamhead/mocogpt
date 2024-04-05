@@ -107,3 +107,18 @@ class TestMocoGPT:
                     model="gpt-4",
                     messages=[{"role": "user", "content": "Hi"}]
                 )
+
+    def test_should_raise_rate_limit_error_in_embeddings(self, client: OpenAI):
+        server = gpt_server(12306)
+        server.embeddings.request(input="Hi").response(error=rate_limit("Rate limit exceeded", 'new_api_error'))
+
+        with server:
+            with pytest.raises(openai.RateLimitError):
+                client.embeddings.create(
+                    model="text-embedding-ada-002",
+                    input="Hi",
+                    encoding_format="float"
+                )
+
+
+
