@@ -1,5 +1,12 @@
-from mocogpt.core.base_typing import Endpoint, Request, Response, ResponseHandler, SessionContext, SleepResponseHandler, \
-    APIErrorHandler
+from mocogpt.core.base_typing import (
+    APIErrorHandler,
+    Endpoint,
+    Request,
+    Response,
+    ResponseHandler,
+    SessionContext,
+    SleepResponseHandler,
+)
 
 
 class EmbeddingsRequest(Request):

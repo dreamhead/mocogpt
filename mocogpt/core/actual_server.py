@@ -134,7 +134,7 @@ class ActualGptServer(GptServer):
         try:
             matched_session = next(
                 (session for session in self.embeddings.sessions if session.match(embeddings_request)), None)
-        except Exception as e:
+        except Exception:
             return await self.default_response(request)
 
         if matched_session is None:

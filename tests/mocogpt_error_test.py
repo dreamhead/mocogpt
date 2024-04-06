@@ -120,5 +120,16 @@ class TestMocoGPT:
                     encoding_format="float"
                 )
 
+    def test_should_raise_authentication_error_in_embeddings(self, client: OpenAI):
+        server = gpt_server(12306)
+        server.embeddings.request(input="Hi").response(
+            error=authentication_error("Authentication Error", 'new_api_error'))
 
+        with server:
+            with pytest.raises(openai.AuthenticationError):
+                client.embeddings.create(
+                    model="text-embedding-ada-002",
+                    input="Hi",
+                    encoding_format="float"
+                )
 
