@@ -1,0 +1,28 @@
+{
+  "embeddings": [
+    {
+      "request": {
+        "input": "rate limit"
+      },
+      "response": {
+        "error": {
+          "name": "rate_limit",
+          "message": "Rate limit exceeded",
+          "type": "new_api_error"
+        }
+      }
+    },
+    {
+      "request": {
+        "input": "authentication error"
+      },
+      "response": {
+        "error": {
+          "name": "authentication_error",
+          "message": "Authentication Error",
+          "type": "new_api_error"
+        }
+      }
+    }
+  ]
+}
