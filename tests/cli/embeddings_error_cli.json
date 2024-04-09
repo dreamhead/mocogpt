@@ -23,6 +23,18 @@
           "type": "new_api_error"
         }
       }
+    },
+    {
+      "request": {
+        "input": "permission denied"
+      },
+      "response": {
+        "error": {
+          "name": "permission_denied",
+          "message": "Permission Denied",
+          "type": "new_api_error"
+        }
+      }
     }
   ]
 }
