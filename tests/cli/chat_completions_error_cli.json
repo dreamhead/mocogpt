@@ -35,6 +35,18 @@
           "type": "new_api_error"
         }
       }
+    },
+    {
+      "request": {
+        "prompt": "not found"
+      },
+      "response": {
+        "error": {
+          "name": "not_found",
+          "message": "Not Found",
+          "type": "new_api_error"
+        }
+      }
     }
   ]
 }
