@@ -83,3 +83,23 @@ class TestEmbeddingsCliError:
 
         service_process.terminate()
         service_process.wait()
+
+    def test_should_run_with_conflict_error_response(self, client):
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        config_file = os.path.join(current_directory, "embeddings_error_cli.json")
+        service_process = subprocess.Popen(
+            ["python", app_file,
+             "start", config_file,
+             "--port", "12306"
+             ])
+
+        with pytest.raises(openai.ConflictError):
+            client.embeddings.create(
+                model="text-embedding-ada-002",
+                input="conflict error",
+                encoding_format="float"
+            )
+
+        service_process.terminate()
+        service_process.wait()
+

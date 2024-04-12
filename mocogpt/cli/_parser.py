@@ -60,7 +60,6 @@ class ChatCompletionsBinder:
             handler["sleep"] = response['sleep']
 
         if "error" in response:
-            print(response["error"])
             handler["error"] = create_error(response["error"])
 
         return handler

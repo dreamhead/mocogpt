@@ -47,6 +47,18 @@
           "type": "new_api_error"
         }
       }
+    },
+    {
+      "request": {
+        "input": "conflict error"
+      },
+      "response": {
+        "error": {
+          "name": "conflict_error",
+          "message": "Conflict Error",
+          "type": "new_api_error"
+        }
+      }
     }
   ]
 }
