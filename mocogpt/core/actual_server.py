@@ -107,8 +107,11 @@ class ActualGptServer(GptServer):
         response = CompletionsResponse(chat_request.model, chat_request.prompt_tokens())
         context = SessionContext(chat_request, response)
 
-        matched_session = next(
-            (session for session in self.chat.completions.sessions if session.match(chat_request)), None)
+        try:
+            matched_session = next(
+                (session for session in self.chat.completions.sessions if session.match(chat_request)), None)
+        except Exception:
+            return await self.default_response(request)
 
         if matched_session is None:
             return await self.default_response(request)
