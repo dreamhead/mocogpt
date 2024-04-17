@@ -100,7 +100,6 @@ class ActualGptServer(GptServer):
     async def _stop(self):
         await self.runner.cleanup()
 
-
     async def chat_completions_api(self, request: web.Request):
         json_request = await request.json()
         await self.monitor.on_session_start(json_request)
@@ -174,7 +173,6 @@ class ActualGptServer(GptServer):
                     {
                         'message': context.response.api_error.message,
                         'type': context.response.api_error.type
-
                     }
             }
         )

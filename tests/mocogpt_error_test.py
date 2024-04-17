@@ -3,6 +3,7 @@ import pytest
 from openai import OpenAI
 
 from mocogpt import (
+    api_error,
     authentication_error,
     bad_request,
     conflict_error,
@@ -132,4 +133,17 @@ class TestMocoGPT:
                     input="Hi",
                     encoding_format="float"
                 )
+
+    def test_should_raise_custom_error(self, client: OpenAI):
+        server = gpt_server(12306)
+        server.chat.completions.request(prompt="Hi").response(
+            error=api_error(402, "Custom Error", 'new_api_error'))
+
+        with server:
+            with pytest.raises(openai.APIStatusError):
+                client.chat.completions.create(
+                    model="gpt-4",
+                    messages=[{"role": "user", "content": "Hi"}]
+                )
+
 

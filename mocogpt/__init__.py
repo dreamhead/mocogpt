@@ -2,6 +2,7 @@ from .core.actual_server import ActualGptServer
 from .core.base_server import GptServer
 from .core.base_typing import (
     any_of,
+    api_error,
     authentication_error,
     bad_request,
     conflict_error,
@@ -27,6 +28,7 @@ __all__ = [
     'endswith',
     'regex',
     'gpt_server',
+    'api_error',
     'rate_limit',
     'authentication_error',
     'permission_denied',

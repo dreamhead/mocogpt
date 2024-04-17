@@ -117,11 +117,15 @@ class APIError:
         self.type = _type
 
 
-def create_api_error(code):
-    def api_error(message, error_type):
-        return APIError(code, message, error_type)
+def api_error(code, message, error_type):
+    return APIError(code, message, error_type)
 
-    return api_error
+
+def create_api_error(code):
+    def do_api_error(message, error_type):
+        return api_error(code, message, error_type)
+
+    return do_api_error
 
 
 bad_request = create_api_error(400)
