@@ -12,7 +12,7 @@ mocogpt = "mocogpt.cli.app:app"
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12"
-aiohttp = "^3.9.4"
+aiohttp = "^3.9.5"
 tiktoken = "^0.6.0"
 click = {version = "^8.1.7", extras = ["cli"]}
 loguru = {version = "^0.7.2", extras = ["cli"]}
