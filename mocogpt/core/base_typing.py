@@ -117,6 +117,12 @@ class APIError:
         self.type = _type
 
 
+class Redirect:
+    def __init__(self, status, location):
+        self.status = status
+        self.location = location
+
+
 def api_error(code, message, error_type):
     return APIError(code, message, error_type)
 
@@ -138,12 +144,17 @@ rate_limit = create_api_error(429)
 internal_error = create_api_error(500)
 
 
+def redirect(status, location):
+    return Redirect(status, location)
+
+
 class Response(ABC):
     def __init__(self, model):
         self._model = model
         self._content = []
         self._status = 200
         self._api_error = None
+        self._redirect = None
 
     def is_success(self):
         return self._status == 200
@@ -157,9 +168,18 @@ class Response(ABC):
         return self._api_error
 
     @api_error.setter
-    def api_error(self, api_error: APIError):
-        self._api_error = api_error
-        self._status = api_error.status
+    def api_error(self, _api_error: APIError):
+        self._api_error = _api_error
+        self._status = _api_error.status
+
+    @property
+    def redirect(self) -> Redirect:
+        return self._redirect
+
+    @redirect.setter
+    def redirect(self, _redirect: Redirect):
+        self._redirect = _redirect
+        self._status = _redirect.status
 
 
 T = TypeVar('T', bound=Request)
@@ -243,6 +263,14 @@ class APIErrorHandler(ResponseHandler):
 
     def write_response(self, context: SessionContext):
         context.response.api_error = self.api_error
+
+
+class RedirectHandler(ResponseHandler):
+    def __init__(self, redirect: Redirect):
+        self.redirect = redirect
+
+    def write_response(self, context: SessionContext):
+        context.response.redirect = self.redirect
 
 
 def make_sig(*names) -> Signature:

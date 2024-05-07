@@ -10,7 +10,7 @@ from mocogpt.core.base_typing import (
     Response,
     ResponseHandler,
     SessionContext,
-    SleepResponseHandler,
+    SleepResponseHandler, RedirectHandler,
 )
 
 
@@ -150,7 +150,8 @@ class Completions(Endpoint):
     _response_params = {
         'content': ContentResponseHandler,
         'sleep': SleepResponseHandler,
-        'error': APIErrorHandler
+        'error': APIErrorHandler,
+        'redirect': RedirectHandler,
     }
 
 

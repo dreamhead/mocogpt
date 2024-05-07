@@ -16,7 +16,7 @@ from mocogpt import (
 )
 
 
-class TestMocoGPT:
+class TestMocoGPTError:
     def test_should_raise_rate_limit_error(self, client: OpenAI):
         server = gpt_server(12306)
         server.chat.completions.request(prompt="Hi").response(error=rate_limit("Rate limit exceeded", 'new_api_error'))

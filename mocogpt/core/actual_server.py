@@ -167,6 +167,11 @@ class ActualGptServer(GptServer):
 
     async def error_response(self, request, context: SessionContext):
         status = context.response.status
+        if context.response.redirect is not None:
+            response = web.Response(status=status, headers={'Location': context.response.redirect.location})
+            await response.prepare(request)
+            return response
+
         result = json.dumps(
             {
                 'error':
@@ -179,3 +184,4 @@ class ActualGptServer(GptServer):
         response = web.Response(status=status, text=result)
         await response.prepare(request)
         return response
+

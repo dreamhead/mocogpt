@@ -16,7 +16,7 @@ from .core.base_typing import (
     rate_limit,
     regex,
     startswith,
-    unprocessable_entity,
+    unprocessable_entity, redirect,
 )
 
 __all__ = [
@@ -36,7 +36,8 @@ __all__ = [
     'bad_request',
     'conflict_error',
     'internal_error',
-    'unprocessable_entity'
+    'unprocessable_entity',
+    'redirect',
 ]
 
 
