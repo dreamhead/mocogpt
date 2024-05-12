@@ -43,3 +43,16 @@ class TestMocoRedirect:
                     messages=[{"role": "user", "content": "Hi"}]
                 )
                 assert response.choices[0].message.content == "How can I assist you?"
+
+    def test_should_redirect_307_in_embeddings(self, client: OpenAI):
+        client = OpenAI(base_url="http://localhost:12306/v1", api_key="sk-123456789",
+                        http_client=httpx.Client(base_url="http://localhost:12306/v1", follow_redirects=False))
+
+        server = gpt_server(12306)
+        server.embeddings.request(input="Hi").response(redirect=redirect(307, "http://localhost:12307/v1/chat/completions"))
+
+        with server:
+            with pytest.raises(openai.APIStatusError):
+                client.chat.completions.create(
+                    model="gpt-4",
+                    messages=[{"role": "user", "content": "Hi"}])

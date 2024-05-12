@@ -5,7 +5,7 @@ from mocogpt.core.base_typing import (
     Response,
     ResponseHandler,
     SessionContext,
-    SleepResponseHandler,
+    SleepResponseHandler, RedirectHandler,
 )
 
 
@@ -60,5 +60,6 @@ class Embeddings(Endpoint):
     _response_params = {
         'embeddings': EmbeddingsResponseHandler,
         'sleep': SleepResponseHandler,
-        'error': APIErrorHandler
+        'error': APIErrorHandler,
+        'redirect': RedirectHandler
     }
