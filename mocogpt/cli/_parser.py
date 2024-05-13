@@ -15,6 +15,12 @@ def create_error(error):
     raise f"Unknown API Error: {name}"
 
 
+def create_direct(redirect):
+    status = redirect['status']
+    location = redirect['location']
+    return mocogpt.redirect(status, location)
+
+
 class ChatCompletionsBinder:
     def bind(self, settings, server):
         for setting in settings:
@@ -61,6 +67,9 @@ class ChatCompletionsBinder:
 
         if "error" in response:
             handler["error"] = create_error(response["error"])
+
+        if "redirect" in response:
+            handler["redirect"] = create_direct(response["redirect"])
 
         return handler
 

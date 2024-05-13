@@ -37,6 +37,17 @@
           "type": "new_api_error"
         }
       }
+    },
+    {
+      "request": {
+        "prompt": "redirect"
+      },
+      "response": {
+        "redirect": {
+          "status": 307,
+          "location": "http://localhost:12307/v1/chat/completions"
+        }
+      }
     }
   ]
 }
