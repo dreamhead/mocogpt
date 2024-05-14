@@ -123,3 +123,4 @@ class TestMocoGPTCli:
 
         service_process.terminate()
         service_process.wait()
+

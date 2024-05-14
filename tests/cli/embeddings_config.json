@@ -238,6 +238,21 @@
                   -0.015529909, 0.004085649, 0.0026936075, -0.03133918, 0.041091405, -0.017739397, -0.018552084,
                   0.014539449, 0.010431578, -0.015288644, -0.019364769, -0.0027967806]
       }
+    },
+    {
+      "request": {
+        "input": "Redirect",
+        "model": "text-embedding-ada-002",
+        "encoding_format": "float",
+        "dimensions": 1536,
+        "user": "user123456"
+      },
+      "response": {
+        "redirect": {
+          "status": 307,
+          "location": "http://localhost:12307/v1/embeddings"
+        }
+      }
     }
   ]
 }

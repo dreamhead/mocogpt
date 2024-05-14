@@ -122,6 +122,9 @@ class EmbeddingsBinder:
         if "error" in response:
             handler["error"] = create_error(response["error"])
 
+        if "redirect" in response:
+            handler["redirect"] = create_direct(response["redirect"])
+
         return handler
 
 
