@@ -21,6 +21,15 @@ def create_direct(redirect):
     return mocogpt.redirect(status, location)
 
 
+def create_common_handler(response: dict, handler: dict):
+    if "sleep" in response:
+        handler["sleep"] = response['sleep']
+    if "error" in response:
+        handler["error"] = create_error(response["error"])
+    if "redirect" in response:
+        handler["redirect"] = create_direct(response["redirect"])
+
+
 class ChatCompletionsBinder:
     def bind(self, settings, server):
         for setting in settings:
@@ -62,14 +71,7 @@ class ChatCompletionsBinder:
         if "content" in response:
             handler["content"] = response['content']
 
-        if "sleep" in response:
-            handler["sleep"] = response['sleep']
-
-        if "error" in response:
-            handler["error"] = create_error(response["error"])
-
-        if "redirect" in response:
-            handler["redirect"] = create_direct(response["redirect"])
+        create_common_handler(response, handler)
 
         return handler
 
@@ -116,14 +118,7 @@ class EmbeddingsBinder:
         if "embeddings" in response:
             handler["embeddings"] = response["embeddings"]
 
-        if "sleep" in response:
-            handler["sleep"] = response['sleep']
-
-        if "error" in response:
-            handler["error"] = create_error(response["error"])
-
-        if "redirect" in response:
-            handler["redirect"] = create_direct(response["redirect"])
+        create_common_handler(response, handler)
 
         return handler
 
