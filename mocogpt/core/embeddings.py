@@ -1,11 +1,12 @@
 from mocogpt.core.base_typing import (
     APIErrorHandler,
     Endpoint,
+    RedirectHandler,
     Request,
     Response,
     ResponseHandler,
     SessionContext,
-    SleepResponseHandler, RedirectHandler,
+    SleepResponseHandler,
 )
 
 
