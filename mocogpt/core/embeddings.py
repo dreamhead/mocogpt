@@ -60,7 +60,7 @@ class Embeddings(Endpoint):
     }
     _response_params = {
         'embeddings': EmbeddingsResponseHandler,
-        'sleep': SleepResponseHandler,
-        'error': APIErrorHandler,
-        'redirect': RedirectHandler
+        # 'sleep': SleepResponseHandler,
+        # 'error': APIErrorHandler,
+        # 'redirect': RedirectHandler
     }

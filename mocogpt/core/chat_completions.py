@@ -150,9 +150,9 @@ class Completions(Endpoint):
 
     _response_params = {
         'content': ContentResponseHandler,
-        'sleep': SleepResponseHandler,
-        'error': APIErrorHandler,
-        'redirect': RedirectHandler,
+        # 'sleep': SleepResponseHandler,
+        # 'error': APIErrorHandler,
+        # 'redirect': RedirectHandler,
     }
 
 

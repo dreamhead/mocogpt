@@ -298,23 +298,25 @@ class SessionSetting:
         self._handler = self._create_handler(**kwargs)
 
 
-class EndpointMeta(type):
-    def __new__(cls, clsname, bases, clsdict):
-        request_params: dict = clsdict.get('_request_params', {})
-        clsdict['__request_sig__'] = make_sig(*request_params)
-        response_params: dict = clsdict.get('_response_params', [])
-        clsdict['__response_sig__'] = make_sig(*response_params.keys())
-        return super().__new__(cls, clsname, bases, clsdict)
-
-
-class Endpoint(metaclass=EndpointMeta):
+class Endpoint:
+    _DEFAULT_RESPONSE_PARAMS = {
+        'sleep': SleepResponseHandler,
+        'error': APIErrorHandler,
+        'redirect': RedirectHandler
+    }
     _request_params = []
     _response_params = {}
 
     def __init__(self):
         self.sessions = []
         self._create_matchers = partial(self._actual_create_matchers)
-        self._create_handlers = partial(self._create_components, self.__response_sig__, self._response_params)
+        response_params = {
+            **self._DEFAULT_RESPONSE_PARAMS,
+            **self._response_params
+        }
+        self.__request_sig__ = make_sig(*self._request_params)
+        self.__response_sig__ = make_sig(*response_params.keys())
+        self._create_handlers = partial(self._create_components, self.__response_sig__, response_params)
 
     def request(self, **kwargs) -> SessionSetting:
         matcher = self._create_matchers(**kwargs)
