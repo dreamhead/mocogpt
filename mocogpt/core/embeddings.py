@@ -50,17 +50,13 @@ class EmbeddingsResponseHandler(ResponseHandler[EmbeddingsResponse]):
 
 
 class Embeddings(Endpoint):
-    _request_params = {
-        'api_key',
+    _request_params = [
         'model',
         'input',
         'encoding_format',
         'dimensions',
         'user'
-    }
+    ]
     _response_params = {
-        'embeddings': EmbeddingsResponseHandler,
-        # 'sleep': SleepResponseHandler,
-        # 'error': APIErrorHandler,
-        # 'redirect': RedirectHandler
+        'embeddings': EmbeddingsResponseHandler
     }

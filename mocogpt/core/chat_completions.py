@@ -132,7 +132,6 @@ class ContentResponseHandler(ResponseHandler[CompletionsResponse]):
 
 class Completions(Endpoint):
     _request_params = [
-        'api_key',
         'model',
         'prompt',
         'temperature',
@@ -149,10 +148,7 @@ class Completions(Endpoint):
     ]
 
     _response_params = {
-        'content': ContentResponseHandler,
-        # 'sleep': SleepResponseHandler,
-        # 'error': APIErrorHandler,
-        # 'redirect': RedirectHandler,
+        'content': ContentResponseHandler
     }
 
 

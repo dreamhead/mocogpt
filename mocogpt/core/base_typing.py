@@ -299,6 +299,9 @@ class SessionSetting:
 
 
 class Endpoint:
+    _DEFAULT_REQUEST_PARAMS = [
+        'api_key'
+    ]
     _DEFAULT_RESPONSE_PARAMS = {
         'sleep': SleepResponseHandler,
         'error': APIErrorHandler,
@@ -310,13 +313,15 @@ class Endpoint:
     def __init__(self):
         self.sessions = []
         self._create_matchers = partial(self._actual_create_matchers)
-        response_params = {
+
+        self_actual_response_params = {
             **self._DEFAULT_RESPONSE_PARAMS,
             **self._response_params
         }
-        self.__request_sig__ = make_sig(*self._request_params)
-        self.__response_sig__ = make_sig(*response_params.keys())
-        self._create_handlers = partial(self._create_components, self.__response_sig__, response_params)
+        self._actual_request_params = self._DEFAULT_REQUEST_PARAMS + self._request_params
+        self.__request_sig__ = make_sig(*self._actual_request_params)
+        self.__response_sig__ = make_sig(*self_actual_response_params.keys())
+        self._create_handlers = partial(self._create_components, self.__response_sig__, self_actual_response_params)
 
     def request(self, **kwargs) -> SessionSetting:
         matcher = self._create_matchers(**kwargs)
@@ -327,7 +332,7 @@ class Endpoint:
     def _actual_create_matchers(self, **kwargs):
         self.__request_sig__.bind(**kwargs)
         components = [self._do_create_matchers(param, value)
-                      for param in self._request_params if (value := kwargs.get(param))]
+                      for param in self._actual_request_params if (value := kwargs.get(param))]
 
         if len(components) == 0:
             raise ValueError('No components specified')
