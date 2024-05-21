@@ -21,6 +21,11 @@ def create_direct(redirect):
     return mocogpt.redirect(status, location)
 
 
+def create_common_matcher(request: dict, matcher: dict):
+    if "api_key" in request:
+        matcher['api_key'] = request['api_key']
+
+
 def create_common_handler(response: dict, handler: dict):
     if "sleep" in response:
         handler["sleep"] = response['sleep']
@@ -46,8 +51,8 @@ class ChatCompletionsBinder:
 
     def create_matcher(self, request) -> dict:
         matcher = {}
-        if "api_key" in request:
-            matcher['api_key'] = request['api_key']
+
+        create_common_matcher(request, matcher)
 
         if "prompt" in request:
             matcher['prompt'] = request['prompt']
@@ -93,8 +98,7 @@ class EmbeddingsBinder:
     def create_matcher(self, request):
         matcher = {}
 
-        if "api_key" in request:
-            matcher["api_key"] = request['api_key']
+        create_common_matcher(request, matcher)
 
         if "model" in request:
             matcher["model"] = request['model']
