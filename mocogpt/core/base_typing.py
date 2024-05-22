@@ -106,6 +106,14 @@ class Request(metaclass=RequestMeta):
         return self._headers['Authorization'].split('Bearer ')[1]
 
     @property
+    def organization(self) -> str:
+        return self._headers['OpenAI-Organization']
+
+    @property
+    def project(self) -> str:
+        return self._headers['OpenAI-Project']
+
+    @property
     def model(self) -> str:
         return self._content['model']
 
@@ -300,7 +308,7 @@ class SessionSetting:
 
 class Endpoint:
     _DEFAULT_REQUEST_PARAMS = [
-        'api_key'
+        'api_key', 'organization', 'project'
     ]
     _DEFAULT_RESPONSE_PARAMS = {
         'sleep': SleepResponseHandler,
@@ -314,14 +322,14 @@ class Endpoint:
         self.sessions = []
         self._create_matchers = partial(self._actual_create_matchers)
 
-        self_actual_response_params = {
+        self._actual_response_params = {
             **self._DEFAULT_RESPONSE_PARAMS,
             **self._response_params
         }
         self._actual_request_params = self._DEFAULT_REQUEST_PARAMS + self._request_params
         self.__request_sig__ = make_sig(*self._actual_request_params)
-        self.__response_sig__ = make_sig(*self_actual_response_params.keys())
-        self._create_handlers = partial(self._create_components, self.__response_sig__, self_actual_response_params)
+        self.__response_sig__ = make_sig(*self._actual_response_params.keys())
+        self._create_handlers = partial(self._create_components, self.__response_sig__, self._actual_response_params)
 
     def request(self, **kwargs) -> SessionSetting:
         matcher = self._create_matchers(**kwargs)

@@ -217,6 +217,29 @@ class TestChatCompletions:
 
             assert response.choices[0].message.content == "Hello"
 
+    def test_should_reply_content_for_specified_organization_and_project(self, client: OpenAI):
+        server = gpt_server(12306)
+        server.chat.completions.request(organization="123456", project="123456", prompt="Hi").response(content="Hi")
+        server.chat.completions.request(organization="654321", project="654321", prompt="Hi").response(content="Hello")
+
+        with server:
+            client = OpenAI(base_url="http://localhost:12306/v1", api_key="sk-123456789", organization="123456", project="123456")
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": "Hi"}]
+            )
+
+            assert response.choices[0].message.content == "Hi"
+
+            client = OpenAI(base_url="http://localhost:12306/v1", api_key="sk-987654321", organization="654321", project="654321")
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": "Hi"}]
+            )
+
+            assert response.choices[0].message.content == "Hello"
+
+
     def test_should_reply_content_for_specified_delay(self, client: OpenAI):
         server = gpt_server(12306)
         server.chat.completions.request(prompt="Hi").response(content="How can I assist you?", sleep=1)
