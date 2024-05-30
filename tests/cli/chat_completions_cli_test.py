@@ -124,3 +124,24 @@ class TestMocoGPTCli:
         service_process.terminate()
         service_process.wait()
 
+    def test_should_run_with_organization_and_project(self, client):
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        config_file = os.path.join(current_directory, "chat_completions_config.json")
+        service_process = subprocess.Popen(
+            ["python", app_file,
+             "start", config_file,
+             "--port", "12306"
+             ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        try:
+            client = OpenAI(base_url="http://localhost:12306/v1", api_key="sk-123456789", organization="123456",
+                            project="123456")
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": "Orgnazation and Project"}]
+            )
+            assert response.choices[0].message.content == "How can I assist you?"
+        finally:
+            service_process.terminate()
+            service_process.wait()
+
+

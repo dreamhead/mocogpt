@@ -25,6 +25,12 @@ def create_common_matcher(request: dict, matcher: dict):
     if "api_key" in request:
         matcher['api_key'] = request['api_key']
 
+    if "organization" in request:
+        matcher['organization'] = request['organization']
+
+    if "project" in request:
+        matcher['project'] = request['project']
+
 
 def create_common_handler(response: dict, handler: dict):
     if "sleep" in response:

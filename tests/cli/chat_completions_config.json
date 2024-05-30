@@ -48,6 +48,15 @@
           "location": "http://localhost:12307/v1/chat/completions"
         }
       }
+    },
+    {
+      "request": {
+        "organization": "123456",
+        "project": "123456"
+      },
+      "response": {
+        "content": "How can I assist you?"
+      }
     }
   ]
 }
