@@ -21,6 +21,22 @@ class TestChatCompletions:
             assert response.usage.completion_tokens >= 0
             assert response.usage.total_tokens >= 0
 
+    def test_should_reply_content_for_specified_messages(self, client: OpenAI):
+        server = gpt_server(12306)
+        server.chat.completions.request(messages=[{"role": "user", "content": "Hi"}]).response(content="How can I assist you?")
+
+        with server:
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": "Hi"}]
+            )
+
+            assert response.choices[0].message.content == "How can I assist you?"
+            assert response.usage.prompt_tokens >= 0
+            assert response.usage.completion_tokens >= 0
+            assert response.usage.total_tokens >= 0
+
+
     def test_should_reply_content_for_specified_prompt_in_stream(self, client: OpenAI):
         server = gpt_server(12306)
         server.chat.completions.request(prompt="Hi").response(content="How can I assist you?")
@@ -223,7 +239,8 @@ class TestChatCompletions:
         server.chat.completions.request(organization="654321", project="654321", prompt="Hi").response(content="Hello")
 
         with server:
-            client = OpenAI(base_url="http://localhost:12306/v1", api_key="sk-123456789", organization="123456", project="123456")
+            client = OpenAI(base_url="http://localhost:12306/v1", api_key="sk-123456789",
+                            organization="123456", project="123456")
             response = client.chat.completions.create(
                 model="gpt-4",
                 messages=[{"role": "user", "content": "Hi"}]
@@ -231,7 +248,8 @@ class TestChatCompletions:
 
             assert response.choices[0].message.content == "Hi"
 
-            client = OpenAI(base_url="http://localhost:12306/v1", api_key="sk-987654321", organization="654321", project="654321")
+            client = OpenAI(base_url="http://localhost:12306/v1", api_key="sk-987654321",
+                            organization="654321", project="654321")
             response = client.chat.completions.create(
                 model="gpt-4",
                 messages=[{"role": "user", "content": "Hi"}]
