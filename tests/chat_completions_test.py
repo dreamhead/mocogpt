@@ -23,7 +23,8 @@ class TestChatCompletions:
 
     def test_should_reply_content_for_specified_messages(self, client: OpenAI):
         server = gpt_server(12306)
-        server.chat.completions.request(messages=[{"role": "user", "content": "Hi"}]).response(content="How can I assist you?")
+        server.chat.completions.request(messages=[{"role": "user", "content": "Hi"}]).response(
+            content="How can I assist you?")
 
         with server:
             response = client.chat.completions.create(
@@ -35,7 +36,6 @@ class TestChatCompletions:
             assert response.usage.prompt_tokens >= 0
             assert response.usage.completion_tokens >= 0
             assert response.usage.total_tokens >= 0
-
 
     def test_should_reply_content_for_specified_prompt_in_stream(self, client: OpenAI):
         server = gpt_server(12306)
@@ -172,7 +172,7 @@ class TestChatCompletions:
 
             assert response.choices[0].message.content == "How can I assist you?"
 
-    def test_should_reply_content_for_specified_logit_bias(self, client: OpenAI):
+    def test_should_reply_content_for_specified_logprobs(self, client: OpenAI):
         server = gpt_server(12306)
         server.chat.completions.request(logprobs=True).response(content="How can I assist you?")
 
@@ -207,6 +207,19 @@ class TestChatCompletions:
                 model="gpt-3.5-turbo-1106",
                 messages=[{"role": "user", "content": "Hi"}],
                 top_p=1.0
+            )
+
+            assert response.choices[0].message.content == "How can I assist you?"
+
+    def test_should_reply_content_for_specified_logit_bias(self, client: OpenAI):
+        server = gpt_server(12306)
+        server.chat.completions.request(logit_bias={"1787": -100}).response(content="How can I assist you?")
+
+        with server:
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo-1106",
+                messages=[{"role": "user", "content": "Hi"}],
+                logit_bias={"1787": -100}
             )
 
             assert response.choices[0].message.content == "How can I assist you?"
@@ -256,7 +269,6 @@ class TestChatCompletions:
             )
 
             assert response.choices[0].message.content == "Hello"
-
 
     def test_should_reply_content_for_specified_delay(self, client: OpenAI):
         server = gpt_server(12306)
