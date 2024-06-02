@@ -224,6 +224,60 @@ class TestChatCompletions:
 
             assert response.choices[0].message.content == "How can I assist you?"
 
+    def test_should_reply_content_for_specified_tools(self, client: OpenAI):
+        server = gpt_server(12306)
+        server.chat.completions.request(tools=[
+            {
+                "type": "function",
+                "function": {
+                    "name": "get_current_weather",
+                    "description": "Get the current weather in a given location",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "location": {
+                                "type": "string",
+                                "description": "The city and state, e.g. San Francisco, CA"
+                            },
+                            "unit": {
+                                "type": "string",
+                                "enum": ["celsius", "fahrenheit"]
+                            }
+                        },
+                        "required": ["location"]
+                    }
+                }
+            }
+        ]).response(content="How can I assist you?")
+
+        with server:
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo-1106",
+                messages=[{"role": "user", "content": "Hi"}],
+                tools=[
+                    {
+                        "function": {
+                            "name": "get_current_weather",
+                            "description": "Get the current weather in a given location",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {
+                                    "location": {
+                                        "type": "string",
+                                        "description": "The city and state, e.g. San Francisco, CA",
+                                    },
+                                    "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+                                },
+                                "required": ["location"],
+                            },
+                        },
+                        "type": "function"
+                    }
+                ]
+            )
+
+            assert response.choices[0].message.content == "How can I assist you?"
+
     def test_should_reply_content_for_specified_api_key(self, client: OpenAI):
         server = gpt_server(12306)
         server.chat.completions.request(api_key="sk-123456789", prompt="Hi").response(content="Hi")
