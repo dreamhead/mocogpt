@@ -18,7 +18,8 @@ def count_tokens(model: str, content: str) -> int:
 
 class CompletionsRequest(Request):
     _content_fields = ['messages', 'temperature', 'max_tokens', 'user', 'n', 'seed', 'stop',
-                       'frequency_penalty', 'presence_penalty', 'logprobs', 'top_logprobs', 'top_p', 'logit_bias', 'tools']
+                       'frequency_penalty', 'presence_penalty', 'logprobs', 'top_logprobs', 'top_p', 'logit_bias',
+                       'tools', 'tool_choice']
 
     @property
     def prompt(self) -> str:
@@ -144,7 +145,8 @@ class Completions(Endpoint):
         'top_logprobs',
         'top_p',
         'logit_bias',
-        'tools'
+        'tools',
+        'tool_choice'
     ]
 
     _response_params = {
