@@ -75,6 +75,9 @@ class ChatCompletionsBinder:
         if "user" in request:
             matcher['user'] = request['user']
 
+        if "n" in request:
+            matcher['n'] = request['n']
+
         return matcher
 
     def create_handler(self, response) -> dict:

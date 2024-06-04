@@ -51,6 +51,14 @@
     },
     {
       "request": {
+        "n": 2
+      },
+      "response": {
+        "content": "Hi, n"
+      }
+    },
+    {
+      "request": {
         "organization": "123456",
         "project": "123456"
       },

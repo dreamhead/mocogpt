@@ -124,6 +124,26 @@ class TestMocoGPTCli:
         service_process.terminate()
         service_process.wait()
 
+    def test_should_run_with_n(self, client):
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        config_file = os.path.join(current_directory, "chat_completions_config.json")
+        service_process = subprocess.Popen(
+            ["python", app_file,
+             "start", config_file,
+             "--port", "12306"
+             ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4",
+                n=2,
+                messages=[{"role": "user", "content": "Hi,n"}]
+            )
+            assert response.choices[0].message.content == "Hi, n"
+        finally:
+            service_process.terminate()
+            service_process.wait()
+
+
     def test_should_run_with_organization_and_project(self, client):
         current_directory = os.path.dirname(os.path.abspath(__file__))
         config_file = os.path.join(current_directory, "chat_completions_config.json")
