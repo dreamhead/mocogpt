@@ -143,7 +143,6 @@ class TestMocoGPTCli:
             service_process.terminate()
             service_process.wait()
 
-
     def test_should_run_with_organization_and_project(self, client):
         current_directory = os.path.dirname(os.path.abspath(__file__))
         config_file = os.path.join(current_directory, "chat_completions_config.json")
@@ -163,5 +162,3 @@ class TestMocoGPTCli:
         finally:
             service_process.terminate()
             service_process.wait()
-
-
