@@ -291,6 +291,20 @@ class TestChatCompletions:
 
             assert response.choices[0].message.content == "How can I assist you?"
 
+    def test_should_reply_content_for_specified_parallel_tool_calls(self, client: OpenAI):
+        server = gpt_server(12306)
+        server.chat.completions.request(parallel_tool_calls=True).response(content="How can I assist you?")
+
+        with server:
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo-1106",
+                messages=[{"role": "user", "content": "Hi"}],
+                parallel_tool_calls=True
+            )
+
+            assert response.choices[0].message.content == "How can I assist you?"
+
+
     def test_should_reply_content_for_specified_api_key(self, client: OpenAI):
         server = gpt_server(12306)
         server.chat.completions.request(api_key="sk-123456789", prompt="Hi").response(content="Hi")
