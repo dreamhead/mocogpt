@@ -91,7 +91,7 @@ class RequestMeta(type):
         _content_fields: list[str] = clsdict.get('_content_fields', [])
         for field in _content_fields:
             clsdict[field] = property(
-                lambda self, _field=field: self._content[_field] if _field in self._content else None)
+                lambda self, _field=field: self._content.get(_field, None))
 
         return super().__new__(cls, clsname, bases, clsdict)
 
@@ -107,11 +107,11 @@ class Request(metaclass=RequestMeta):
 
     @property
     def organization(self) -> str:
-        return self._headers['OpenAI-Organization']
+        return self._headers.get('OpenAI-Organization', None)
 
     @property
     def project(self) -> str:
-        return self._headers['OpenAI-Project']
+        return self._headers.get('OpenAI-Project', None)
 
     @property
     def model(self) -> str:
