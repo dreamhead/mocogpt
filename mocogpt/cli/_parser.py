@@ -21,15 +21,12 @@ def create_direct(redirect):
     return mocogpt.redirect(status, location)
 
 
+def create_matcher(request: dict, matcher: dict, keys: list):
+    matcher.update({k: v for k, v in request.items() if k in keys})
+
+
 def create_common_matcher(request: dict, matcher: dict):
-    if "api_key" in request:
-        matcher['api_key'] = request['api_key']
-
-    if "organization" in request:
-        matcher['organization'] = request['organization']
-
-    if "project" in request:
-        matcher['project'] = request['project']
+    create_matcher(request, matcher, ['api_key', 'organization', 'project'])
 
 
 def create_common_handler(response: dict, handler: dict):
@@ -59,24 +56,7 @@ class ChatCompletionsBinder:
         matcher = {}
 
         create_common_matcher(request, matcher)
-
-        if "prompt" in request:
-            matcher['prompt'] = request['prompt']
-
-        if "model" in request:
-            matcher['model'] = request['model']
-
-        if "temperature" in request:
-            matcher['temperature'] = request['temperature']
-
-        if "max_tokens" in request:
-            matcher['max_tokens'] = request['max_tokens']
-
-        if "user" in request:
-            matcher['user'] = request['user']
-
-        if "n" in request:
-            matcher['n'] = request['n']
+        create_matcher(request, matcher, ["prompt", "model", "temperature", "max_tokens", "user", "n"])
 
         return matcher
 
