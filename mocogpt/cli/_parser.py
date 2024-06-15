@@ -26,7 +26,7 @@ def create_matcher(request: dict, matcher: dict, keys: list):
 
 
 def create_common_matcher(request: dict, matcher: dict):
-    create_matcher(request, matcher, ['api_key', 'organization', 'project'])
+    create_matcher(request, matcher, ['api_key', 'organization', 'project', 'model'])
 
 
 def create_common_handler(response: dict, handler: dict):
@@ -56,7 +56,7 @@ class ChatCompletionsBinder:
         matcher = {}
 
         create_common_matcher(request, matcher)
-        create_matcher(request, matcher, ["prompt", "model", "temperature", "max_tokens", "user", "n"])
+        create_matcher(request, matcher, ["prompt", "temperature", "max_tokens", "user", "n"])
 
         return matcher
 
@@ -88,21 +88,7 @@ class EmbeddingsBinder:
         matcher = {}
 
         create_common_matcher(request, matcher)
-
-        if "model" in request:
-            matcher["model"] = request['model']
-
-        if "input" in request:
-            matcher["input"] = request['input']
-
-        if "encoding_format" in request:
-            matcher["encoding_format"] = request['encoding_format']
-
-        if "dimensions" in request:
-            matcher["dimensions"] = request['dimensions']
-
-        if "user" in request:
-            matcher["user"] = request['user']
+        create_matcher(request, matcher, ["input", "encoding_format", "dimensions", "user"])
 
         return matcher
 
