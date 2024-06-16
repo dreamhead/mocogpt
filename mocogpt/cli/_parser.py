@@ -56,7 +56,12 @@ class ChatCompletionsBinder:
         matcher = {}
 
         create_common_matcher(request, matcher)
-        create_matcher(request, matcher, ["prompt", "temperature", "max_tokens", "user", "n"])
+        create_matcher(request, matcher,
+                       ["prompt", "temperature", "max_tokens", "user",
+                        "n", 'messages', 'seed', 'stop',
+                        'frequency_penalty', 'presence_penalty',
+                        'logprobs', 'top_logprobs', 'top_p', 'logit_bias',
+                        'tools', 'tool_choice', 'parallel_tool_calls'])
 
         return matcher
 
