@@ -59,6 +59,14 @@
     },
     {
       "request": {
+        "seed": 12345
+      },
+      "response": {
+        "content": "Hi, seed"
+      }
+    },
+    {
+      "request": {
         "organization": "123456",
         "project": "123456"
       },
