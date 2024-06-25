@@ -104,6 +104,16 @@ class TestMocoGPTCli:
 
             assert response.choices[0].message.content == "Hi, seed"
 
+    def test_should_run_with_stop(self, client):
+        with self.run_service("chat_completions_config.json", "12306"):
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo-1106",
+                messages=[{"role": "user", "content": "Hi,stop"}],
+                stop="STOP"
+            )
+
+            assert response.choices[0].message.content == "Hi, stop"
+
 
     def test_should_run_with_organization_and_project(self, client):
         with self.run_service("chat_completions_config.json", "12306"):

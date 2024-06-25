@@ -67,6 +67,14 @@
     },
     {
       "request": {
+        "stop": "STOP"
+      },
+      "response": {
+        "content": "Hi, stop"
+      }
+    },
+    {
+      "request": {
         "organization": "123456",
         "project": "123456"
       },
