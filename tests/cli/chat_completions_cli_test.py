@@ -114,13 +114,12 @@ class TestMocoGPTCli:
 
             assert response.choices[0].message.content == "Hi, stop"
 
-
     def test_should_run_with_organization_and_project(self, client):
         with self.run_service("chat_completions_config.json", "12306"):
             client = OpenAI(base_url="http://localhost:12306/v1", api_key="sk-123456789", organization="123456",
                             project="123456")
             response = client.chat.completions.create(
                 model="gpt-4",
-                messages=[{"role": "user", "content": "Orgnazation and Project"}]
+                messages=[{"role": "user", "content": "Organization and Project"}]
             )
             assert response.choices[0].message.content == "How can I assist you?"
