@@ -25,7 +25,7 @@ ruff = "^0.5.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.2.2"
-openai = "^1.35.5"
+openai = "^1.35.7"
 pytest-cov = "^5.0.0"
 
 [tool.pytest.ini_options]
