@@ -75,6 +75,14 @@
     },
     {
       "request": {
+        "frequency_penalty": 1.0
+      },
+      "response": {
+        "content": "Hi, frequency_penalty"
+      }
+    },
+    {
+      "request": {
         "organization": "123456",
         "project": "123456"
       },
