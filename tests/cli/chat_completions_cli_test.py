@@ -118,11 +118,21 @@ class TestMocoGPTCli:
         with self.run_service("chat_completions_config.json", "12306"):
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo-1106",
-                messages=[{"role": "user", "content": "Hi,stop"}],
+                messages=[{"role": "user", "content": "Hi, frequency_penalty"}],
                 frequency_penalty=1.0
             )
 
             assert response.choices[0].message.content == "Hi, frequency_penalty"
+
+    def test_should_run_with_presence_penalty(self, client):
+        with self.run_service("chat_completions_config.json", "12306"):
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo-1106",
+                messages=[{"role": "user", "content": "Hi, presence_penalty"}],
+                presence_penalty=1.0
+            )
+
+            assert response.choices[0].message.content == "Hi, presence_penalty"
 
     def test_should_run_with_organization_and_project(self, client):
         with self.run_service("chat_completions_config.json", "12306"):

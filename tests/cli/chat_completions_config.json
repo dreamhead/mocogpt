@@ -83,6 +83,14 @@
     },
     {
       "request": {
+        "presence_penalty": 1.0
+      },
+      "response": {
+        "content": "Hi, presence_penalty"
+      }
+    },
+    {
+      "request": {
         "organization": "123456",
         "project": "123456"
       },
