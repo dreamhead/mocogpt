@@ -91,6 +91,14 @@
     },
     {
       "request": {
+        "top_p": 1.0
+      },
+      "response": {
+        "content": "Hi, top_p"
+      }
+    },
+    {
+      "request": {
         "organization": "123456",
         "project": "123456"
       },
