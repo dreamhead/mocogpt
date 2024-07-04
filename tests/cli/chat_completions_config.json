@@ -99,6 +99,16 @@
     },
     {
       "request": {
+        "logit_bias": {
+          "1787": -100
+        }
+      },
+      "response": {
+        "content": "Hi, logit_bias"
+      }
+    },
+    {
+      "request": {
         "organization": "123456",
         "project": "123456"
       },
