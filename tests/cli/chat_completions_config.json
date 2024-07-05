@@ -109,6 +109,14 @@
     },
     {
       "request": {
+        "logprobs": true
+      },
+      "response": {
+        "content": "Hi, logprobs"
+      }
+    },
+    {
+      "request": {
         "organization": "123456",
         "project": "123456"
       },
