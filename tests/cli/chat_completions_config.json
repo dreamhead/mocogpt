@@ -117,6 +117,14 @@
     },
     {
       "request": {
+        "top_logprobs": 3
+      },
+      "response": {
+        "content": "Hi, top_logprobs"
+      }
+    },
+    {
+      "request": {
         "organization": "123456",
         "project": "123456"
       },
