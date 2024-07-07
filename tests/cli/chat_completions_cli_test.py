@@ -148,7 +148,7 @@ class TestMocoGPTCli:
         with self.run_service("chat_completions_config.json", "12306"):
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo-1106",
-                messages=[{"role": "user", "content": "Hi, top_p"}],
+                messages=[{"role": "user", "content": "Hi, logit_bias"}],
                 logit_bias={"1787": -100}
             )
 
