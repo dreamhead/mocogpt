@@ -125,6 +125,17 @@
     },
     {
       "request": {
+        "messages": [
+          {"role": "assistant", "content": "Hi, assistant"},
+          {"role": "user", "content": "Hi, users"}
+        ]
+      },
+      "response": {
+        "content": "Hi, messages"
+      }
+    },
+    {
+      "request": {
         "organization": "123456",
         "project": "123456"
       },
