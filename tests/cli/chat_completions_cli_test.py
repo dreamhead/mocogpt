@@ -186,6 +186,16 @@ class TestMocoGPTCli:
 
             assert response.choices[0].message.content == "Hi, messages"
 
+    def test_should_reply_content_for_specified_max_token(self, client: OpenAI):
+        with self.run_service("chat_completions_config.json", "12306"):
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo-1106",
+                messages=[{"role": "user", "content": "Hi, max_tokens"}],
+                max_tokens=4096
+            )
+
+            assert response.choices[0].message.content == "Hi, max_tokens"
+
     def test_should_run_with_organization_and_project(self, client):
         with self.run_service("chat_completions_config.json", "12306"):
             client = OpenAI(base_url="http://localhost:12306/v1", api_key="sk-123456789", organization="123456",

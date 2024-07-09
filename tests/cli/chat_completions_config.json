@@ -136,6 +136,14 @@
     },
     {
       "request": {
+        "max_tokens": 4096
+      },
+      "response": {
+        "content": "Hi, max_tokens"
+      }
+    },
+    {
+      "request": {
         "organization": "123456",
         "project": "123456"
       },
