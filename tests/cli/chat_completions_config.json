@@ -180,6 +180,14 @@
       "response": {
         "content": "Hi, tools"
       }
+    },
+    {
+      "request": {
+        "tool_choice": "auto"
+      },
+      "response": {
+        "content": "Hi, tool_choice"
+      }
     }
   ]
 }

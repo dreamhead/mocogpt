@@ -237,3 +237,14 @@ class TestMocoGPTCli:
             )
 
             assert response.choices[0].message.content == "Hi, tools"
+
+    def test_should_run_with_tool_choice(self, client):
+        with self.run_service("chat_completions_config.json", "12306"):
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo-1106",
+                messages=[{"role": "user", "content": "Hi, tool_choice"}],
+                tool_choice="auto"
+            )
+
+            assert response.choices[0].message.content == "Hi, tool_choice"
+
