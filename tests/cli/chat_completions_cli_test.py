@@ -248,3 +248,14 @@ class TestMocoGPTCli:
 
             assert response.choices[0].message.content == "Hi, tool_choice"
 
+    def test_should_run_with_parallel_tool_calls(self, client):
+        with self.run_service("chat_completions_config.json", "12306"):
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo-1106",
+                messages=[{"role": "user", "content": "Hi, parallel_tool_calls"}],
+                parallel_tool_calls=True
+            )
+
+            assert response.choices[0].message.content == "Hi, parallel_tool_calls"
+
+

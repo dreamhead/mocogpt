@@ -188,6 +188,14 @@
       "response": {
         "content": "Hi, tool_choice"
       }
+    },
+    {
+      "request": {
+        "parallel_tool_calls": true
+      },
+      "response": {
+        "content": "Hi, parallel_tool_calls"
+      }
     }
   ]
 }
