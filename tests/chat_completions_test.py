@@ -364,3 +364,20 @@ class TestChatCompletions:
 
             assert response.choices[0].message.content == "How can I assist you?"
             assert stop - start > 1
+
+    def test_should_reply_content_for_finish_reason(self, client: OpenAI):
+        server = gpt_server(12306)
+        server.chat.completions.request(prompt="Hi").response(content="How can I assist you?", finish_reason="length")
+
+        with server:
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": "Hi"}]
+            )
+
+            assert response.choices[0].message.content == "How can I assist you?"
+            assert response.usage.prompt_tokens >= 0
+            assert response.usage.completion_tokens >= 0
+            assert response.usage.total_tokens >= 0
+            assert response.choices[0].finish_reason == "length"
+

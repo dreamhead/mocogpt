@@ -51,6 +51,7 @@ class CompletionsResponse(Response):
         super().__init__(model)
         self._id = f"chatcmpl-{generate_unique_id()}"
         self.prompt_tokens = prompt_tokens
+        self.finish_reason = "stop"
 
     def to_dict(self):
         completion_tokens = self.completion_tokens()
@@ -80,7 +81,7 @@ class CompletionsResponse(Response):
                     "content": content
                 },
                 "logprobs": None,
-                "finish_reason": "stop"
+                "finish_reason": self.finish_reason
             })
         return choices
 
@@ -114,7 +115,7 @@ class CompletionsResponse(Response):
                                 "content": data
                             },
                             "logprobs": None,
-                            "finish_reason": "stop" if data == parts[-1] and content == self._content[-1] else None
+                            "finish_reason": self.finish_reason if data == parts[-1] and content == self._content[-1] else None
                         }
                     ]
                 }
@@ -126,6 +127,14 @@ class ContentResponseHandler(ResponseHandler[CompletionsResponse]):
 
     def write_response(self, context: SessionContext):
         context.response.content = self.content
+
+
+class FinishResponseHandler(ResponseHandler[CompletionsResponse]):
+    def __init__(self, finish_reason: str):
+        self.finish_reason = finish_reason
+
+    def write_response(self, context: SessionContext):
+        context.response.finish_reason = self.finish_reason
 
 
 class Completions(Endpoint):
@@ -151,7 +160,8 @@ class Completions(Endpoint):
     ]
 
     _response_params = {
-        'content': ContentResponseHandler
+        'content': ContentResponseHandler,
+        'finish_reason': FinishResponseHandler
     }
 
 
