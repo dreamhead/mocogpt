@@ -52,6 +52,7 @@ class CompletionsResponse(Response):
         self._id = f"chatcmpl-{generate_unique_id()}"
         self.prompt_tokens = prompt_tokens
         self.finish_reason = "stop"
+        self.system_fingerprint = None
 
     def to_dict(self):
         completion_tokens = self.completion_tokens()
@@ -61,6 +62,7 @@ class CompletionsResponse(Response):
             'created': int(time.time()),
             'model': self._model,
             'choices': self._choices(),
+            'system_fingerprint': self.system_fingerprint,
             'usage': {
                 "prompt_tokens": self.prompt_tokens,
                 "completion_tokens": completion_tokens,
@@ -107,7 +109,7 @@ class CompletionsResponse(Response):
                     "object": "chat.completion.chunk",
                     "created": created,
                     "model": self._model,
-                    "system_fingerprint": None,
+                    "system_fingerprint": self.system_fingerprint,
                     "choices": [
                         {
                             "index": 0,
@@ -115,7 +117,8 @@ class CompletionsResponse(Response):
                                 "content": data
                             },
                             "logprobs": None,
-                            "finish_reason": self.finish_reason if data == parts[-1] and content == self._content[-1] else None
+                            "finish_reason": self.finish_reason if data == parts[-1] and content == self._content[
+                                -1] else None
                         }
                     ]
                 }
@@ -135,6 +138,14 @@ class FinishResponseHandler(ResponseHandler[CompletionsResponse]):
 
     def write_response(self, context: SessionContext):
         context.response.finish_reason = self.finish_reason
+
+
+class SystemFingerprintResponseHandler(ResponseHandler[CompletionsResponse]):
+    def __init__(self, system_fingerprint: str):
+        self.system_fingerprint = system_fingerprint
+
+    def write_response(self, context: SessionContext):
+        context.response.system_fingerprint = self.system_fingerprint
 
 
 class Completions(Endpoint):
@@ -161,7 +172,8 @@ class Completions(Endpoint):
 
     _response_params = {
         'content': ContentResponseHandler,
-        'finish_reason': FinishResponseHandler
+        'finish_reason': FinishResponseHandler,
+        'system_fingerprint': SystemFingerprintResponseHandler
     }
 
 
