@@ -53,6 +53,7 @@ class CompletionsResponse(Response):
         self.prompt_tokens = prompt_tokens
         self.finish_reason = "stop"
         self.system_fingerprint = None
+        self.logprobs = None
 
     def to_dict(self):
         completion_tokens = self.completion_tokens()
@@ -82,7 +83,7 @@ class CompletionsResponse(Response):
                     "role": "assistant",
                     "content": content
                 },
-                "logprobs": None,
+                "logprobs": self.logprobs,
                 "finish_reason": self.finish_reason
             })
         return choices
@@ -148,6 +149,14 @@ class SystemFingerprintResponseHandler(ResponseHandler[CompletionsResponse]):
         context.response.system_fingerprint = self.system_fingerprint
 
 
+class LogprobResponseHandler(ResponseHandler[CompletionsResponse]):
+    def __init__(self, logprobs: dict):
+        self.logprobs = logprobs
+
+    def write_response(self, context: SessionContext):
+        context.response.logprobs = self.logprobs
+
+
 class Completions(Endpoint):
     _request_params = [
         'model',
@@ -173,7 +182,8 @@ class Completions(Endpoint):
     _response_params = {
         'content': ContentResponseHandler,
         'finish_reason': FinishResponseHandler,
-        'system_fingerprint': SystemFingerprintResponseHandler
+        'system_fingerprint': SystemFingerprintResponseHandler,
+        'logprob': LogprobResponseHandler
     }
 
 
